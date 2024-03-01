@@ -82,15 +82,14 @@ void RenderManager::render(Model* models)
     // Perform any modifications we want on the pixels
     raster->drawModels(models);
 
-    // Apply the pixel change to the texture
-    screenTexture.updateTexture(mainCanvas->mBuffer);
-
     // Switch screen texture with back texture and re-draw
     updateScreen();
 }
 
 void RenderManager::updateScreen()
 {
+    screenTexture.updateTexture(mainCanvas->mBuffer);
+
     // Render texture to screen
     screenTexture.renderToScreen(mainRenderer);
 

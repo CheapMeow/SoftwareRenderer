@@ -23,8 +23,6 @@ public:
 
     void loadModels();
 
-    void moveModels(int dt);
-
 private:
     WindowManager FEWindowManager;
     RenderManager FERenderManager;

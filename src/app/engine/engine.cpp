@@ -2,6 +2,7 @@
 #include "math/matrix.h"
 #include "math/vector3.h"
 
+#include <cmath>
 #include <stdio.h>
 #include <string>
 
@@ -66,7 +67,6 @@ void Engine::mainLoop()
         // Right now only does simple demo stuff
         // Maybe physics based in the future??
         int dt = start - end;
-        moveModels(dt);
 
         // Perform all render calculations and update screen
         FERenderManager.render(sceneModels);
@@ -84,29 +84,13 @@ void Engine::loadModels()
     std::string path = "../../../resources/models/teapot.obj";
     sceneModels      = new Model(path);
 
+    // We also initialize the model position here position here
+    TransformParameters initParameters;
+    initParameters.scaling     = Vector3(90, 90, 90);
+    initParameters.rotation    = Vector3(0, 0, 0);
+    initParameters.translation = Vector3(0, 0, 0);
+
+    sceneModels->initPosition(initParameters);
+
     // sceneModels->describeMesh();
-}
-
-// Engine class moves stuff, for now
-// Some kind of physics module should be responsible of this in the future
-// Actually it should probably be moved by user input
-void Engine::moveModels(int dt)
-{
-
-    // Creating model matrix
-    Vector3 position    = Vector3(0, 0, 0);
-    Vector3 rotation    = Vector3(0.01, 0.01, 0.01);
-    Vector3 scaling     = Vector3(1, 1, 1);
-    Matrix4 modelMatrix = Matrix4::modelMatrix(position, rotation, scaling);
-
-    // Getting vector of vertices
-    Mesh*                 modelMesh = sceneModels->getMesh();
-    int                   size      = modelMesh->numVertices;
-    std::vector<Vector3>* vertices  = &modelMesh->vertices;
-
-    // Applying the multiplication
-    for (int i = 0; i < size; ++i)
-    {
-        (*vertices)[i] = modelMatrix.matMultVec((*vertices)[i], 1);
-    }
 }
