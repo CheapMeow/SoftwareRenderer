@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "math/matrix.h"
 #include "math/vector3.h"
 
 #include <stdio.h>
@@ -47,24 +48,29 @@ void Engine::shutDown()
 
 void Engine::mainLoop()
 {
-    bool done  = false;
-    int  count = 0;
+    bool         done  = false;
+    int          count = 0;
+    unsigned int end   = 0;
+    unsigned int start = 0;
     printf("Entered Main Loop!\n");
 
     while (!done)
     {
-        unsigned int start = SDL_GetTicks();
+        start = SDL_GetTicks();
         ++count;
 
         // Handle all user input
         done = FEInputManager.processInput();
 
         // Update entities here in the future
-        moveModels();
+        // Right now only does simple demo stuff
+        // Maybe physics based in the future??
+        int dt = start - end;
+        moveModels(dt);
 
         // Perform all render calculations and update screen
         FERenderManager.render(sceneModels);
-        unsigned int end = SDL_GetTicks();
+        end = SDL_GetTicks();
         // SDL_Delay(100);
         printf("%2.1d: Loop elapsed time (ms):%d\n", count, end - start);
     }
@@ -74,29 +80,33 @@ void Engine::loadModels()
 {
     // In the future I want to read all o the models in the model folder
     // And build them here.  For now I force it to be only one.
+    // Probably should be its own class in the future
     std::string path = "../../../resources/models/teapot.obj";
     sceneModels      = new Model(path);
 
     // sceneModels->describeMesh();
 }
 
-void Engine::moveModels()
+// Engine class moves stuff, for now
+// Some kind of physics module should be responsible of this in the future
+// Actually it should probably be moved by user input
+void Engine::moveModels(int dt)
 {
-    float                 thetax    = 0.001;
-    float                 thetay    = 0.001;
-    float                 thetaz    = 0.00;
-    float                 scale     = 0.999;
-    float                 dd        = 0.0;
+
+    // Creating model matrix
+    Vector3 position    = Vector3(0, 0, 0);
+    Vector3 rotation    = Vector3(0.01, 0.01, 0.01);
+    Vector3 scaling     = Vector3(1, 1, 1);
+    Matrix4 modelMatrix = Matrix4::modelMatrix(position, rotation, scaling);
+
+    // Getting vector of vertices
     Mesh*                 modelMesh = sceneModels->getMesh();
     int                   size      = modelMesh->numVertices;
     std::vector<Vector3>* vertices  = &modelMesh->vertices;
 
+    // Applying the multiplication
     for (int i = 0; i < size; ++i)
     {
-        (*vertices)[i].scale(scale);
-        (*vertices)[i].rotX(thetax);
-        (*vertices)[i].rotY(thetay);
-        (*vertices)[i].rotZ(thetaz);
-        (*vertices)[i].translate(dd, dd, dd);
+        (*vertices)[i] = modelMatrix.matMultVec((*vertices)[i], 1);
     }
 }
