@@ -24,6 +24,8 @@ private:
 
     Uint32 getPixelColor(int x, int y);
 
+    void drawLine(Vector3 vertex1, Vector3 vertex2, Uint32 color);
+
     void setPixelColor(Uint32 color, int x, int y);
 
     int convertCoordinates(int x, int y);

@@ -14,6 +14,8 @@ public:
 
 private:
     void buildMesh(std::string path);
+    void getVertices(std::ifstream& fileHandle);
+    void getFaces(std::ifstream& fileHandle);
     Mesh mMesh;
 };
 

@@ -1,6 +1,7 @@
 #include "model.h"
 #include "math/vector3.h"
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <stdio.h>
 
@@ -22,13 +23,45 @@ void Model::describeMesh()
 void Model::buildMesh(std::string path)
 {
     printf("Loading models...\n");
-    std::fstream file;
-    std::string  line, v, x, y, z;
 
     // Open file containing vertex data
+    std::ifstream file;
     file.open(path.c_str());
 
     // Get vertices into mesh
+    getVertices(file);
+
+    // Get faces
+    getFaces(file);
+
+    // Close file after reading
+    file.close();
+}
+
+void Model::getFaces(std::ifstream& file)
+{
+    std::string line, f, x, y, z;
+    while (!file.eof())
+    {
+
+        std::getline(file, line);
+        std::istringstream iss(line);
+        iss >> f;
+        if (f == "f")
+        {
+            iss >> x >> y >> z;
+            Vector3 face(x, y, z);
+            mMesh.faces.push_back(face);
+        }
+    }
+    mMesh.numFaces = mMesh.faces.size();
+    file.clear();
+    file.seekg(0, file.beg);
+}
+
+void Model::getVertices(std::ifstream& file)
+{
+    std::string line, v, x, y, z;
     while (!file.eof())
     {
         std::getline(file, line);
@@ -41,6 +74,7 @@ void Model::buildMesh(std::string path)
             mMesh.vertices.push_back(vertex);
         }
     }
-    file.close();
     mMesh.numVertices = mMesh.vertices.size();
+    file.clear();
+    file.seekg(0, file.beg);
 }
