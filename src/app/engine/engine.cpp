@@ -1,5 +1,6 @@
 #include "engine.h"
-#include <cmath>
+#include "math/vector3.h"
+
 #include <stdio.h>
 #include <string>
 
@@ -81,19 +82,21 @@ void Engine::loadModels()
 
 void Engine::moveModels()
 {
-    float theta  = 0.01;
-    float cosine = std::cos(theta);
-    float sine   = std::sin(theta);
-
+    float                 thetax    = 0.001;
+    float                 thetay    = 0.001;
+    float                 thetaz    = 0.00;
+    float                 scale     = 0.999;
+    float                 dd        = 0.0;
     Mesh*                 modelMesh = sceneModels->getMesh();
     int                   size      = modelMesh->numVertices;
     std::vector<Vector3>* vertices  = &modelMesh->vertices;
 
     for (int i = 0; i < size; ++i)
     {
-        float xOld       = (*vertices)[i].x;
-        float zOld       = (*vertices)[i].z;
-        (*vertices)[i].x = xOld * cosine + zOld * sine;
-        (*vertices)[i].z = -xOld * sine + zOld * cosine;
+        (*vertices)[i].scale(scale);
+        (*vertices)[i].rotX(thetax);
+        (*vertices)[i].rotY(thetay);
+        (*vertices)[i].rotZ(thetaz);
+        (*vertices)[i].translate(dd, dd, dd);
     }
 }

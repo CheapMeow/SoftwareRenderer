@@ -20,6 +20,13 @@ struct Vector3
         , y(std::stof(y1))
         , z(std::stof(z1))
     {}
+
+    void rotX(float thetaX);
+    void rotY(float thetaY);
+    void rotZ(float thetaZ);
+
+    void scale(float scale);
+    void translate(float dx, float dy, float dz);
 };
 
 #endif
