@@ -3,10 +3,10 @@
 
 #include "SDL.h"
 #include "render/canvas.h"
+#include "render/model.h"
 #include "render/rasterizer.h"
-#include "structs/texture.h"
+#include "render/texture.h"
 #include "windowManager.h"
-
 
 class RenderManager
 {
@@ -28,7 +28,7 @@ public:
 
     bool createCanvas();
 
-    void render();
+    void render(Model* models);
 
     void shutDown();
 

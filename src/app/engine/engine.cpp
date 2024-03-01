@@ -1,9 +1,7 @@
 #include "engine.h"
-#include "inputManager.h"
-#include "renderManager.h"
-#include "windowManager.h"
-#include <stdio.h>
+#include <string>
 
+#include <stdio.h>
 
 Engine::Engine() {}
 
@@ -39,6 +37,8 @@ bool Engine::startUp()
 
 void Engine::shutDown()
 {
+    delete sceneModels;
+    sceneModels = nullptr;
     FEInputManager.shutDown();
     FERenderManager.shutDown();
     FEWindowManager.shutDown();
@@ -52,7 +52,7 @@ void Engine::mainLoop()
 
     while (!done)
     {
-        count++;
+        ++count;
 
         // Handle all user input
         done = FEInputManager.processInput();
@@ -61,9 +61,19 @@ void Engine::mainLoop()
         // TO DO
 
         // Perform all render calculations and update screen
-        FERenderManager.render();
+        FERenderManager.render(sceneModels);
 
         SDL_Delay(500);
         printf("Loop Iteration N:%d\n", count);
     }
+}
+
+void Engine::loadModels()
+{
+    // In the future I want to read all o the models in the model folder
+    // And build them here.  For now I force it to be only one.
+    std::string path = "../../../resources/models/teapot.obj";
+    sceneModels      = new Model(path);
+
+    // sceneModels->describeMesh();
 }

@@ -3,9 +3,9 @@
 
 // Headers
 #include "inputManager.h"
+#include "render/model.h"
 #include "renderManager.h"
 #include "windowManager.h"
-
 
 class Engine
 {
@@ -21,10 +21,13 @@ public:
 
     void mainLoop();
 
+    void loadModels();
+
 private:
     WindowManager FEWindowManager;
     RenderManager FERenderManager;
     InputManager  FEInputManager;
+    Model*        sceneModels;
 };
 
 #endif

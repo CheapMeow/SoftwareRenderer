@@ -1,7 +1,5 @@
 #include "renderManager.h"
 
-#include <stdio.h>
-
 RenderManager::RenderManager() {}
 
 RenderManager::~RenderManager() {}
@@ -75,14 +73,14 @@ void RenderManager::shutDown()
     mainRenderer = nullptr;
 }
 
-void RenderManager::render()
+void RenderManager::render(Model* models)
 {
 
     // Clear Screen back to black
     clearScreen();
 
     // Perform any modifications we want on the pixels
-    raster->makeCoolPattern();
+    raster->drawModels(models);
 
     // Apply the pixel change to the texture
     screenTexture.updateTexture(mainCanvas->mBuffer);
@@ -105,25 +103,3 @@ void RenderManager::clearScreen()
     SDL_SetRenderDrawColor(mainRenderer, 0x00, 0x00, 0x00, 0xFF);
     SDL_RenderClear(mainRenderer);
 }
-
-// void RenderManager::createPixelPattern(){
-//     //Get window pixel format
-//     SDL_PixelFormat *mappingFormat = SDL_AllocFormat (PIXEL_FORMAT);
-
-//     //Set color data
-//     Uint32 red = SDL_MapRGBA(mappingFormat, 0xFF,0x00,0x00,0x60);
-//     Uint32 green = SDL_MapRGBA(mappingFormat, 0x00,0xFF,0x00,0x80);
-//     Uint32 blue = SDL_MapRGBA(mappingFormat, 0x00,0x00,0xFF,0xFF);
-//     //Color in certain pixels
-//     for(int i = 0; i < pixelCount; ++i){
-//         if( (i % 50) == 0){
-//             buffer1[i] = red;
-//         }
-//         if((i % 1000) == 0){
-//             buffer1[i] = green;
-//         }
-//         if((i % 2000) == 0){
-//             buffer1[i] = blue;
-//         }
-//     }
-// }
