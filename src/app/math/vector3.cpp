@@ -33,3 +33,5 @@ Vector3 Vector3::crossProduct(Vector3& rhs)
 float Vector3::dotProduct(Vector3& rhs) { return (this->x) * rhs.x + (this->y) * rhs.y + (this->z) * rhs.z; }
 
 float Vector3::length() { return std::sqrt((this->x * this->x) + (this->y * this->y) + (this->z * this->z)); }
+
+void Vector3::print() { printf("Vec: %f\t%f\t%f\n", x, y, z); }

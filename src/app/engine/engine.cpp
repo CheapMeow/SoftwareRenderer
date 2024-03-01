@@ -86,9 +86,9 @@ void Engine::loadModels()
 
     // We also initialize the model position here position here
     TransformParameters initParameters;
-    initParameters.scaling     = Vector3(90, 90, 90);
+    // initParameters.scaling = Vector3(1, 60, 60);
     initParameters.rotation    = Vector3(0, 0, 0);
-    initParameters.translation = Vector3(0, 0, 0);
+    initParameters.translation = Vector3(0, -1, 0);
 
     sceneModels->initPosition(initParameters);
 

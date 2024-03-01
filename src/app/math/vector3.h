@@ -32,6 +32,8 @@ struct Vector3
     Vector3 crossProduct(Vector3& rhs);
 
     float dotProduct(Vector3& rhs);
+
+    void print();
 };
 
 #endif

@@ -19,7 +19,7 @@ public:
     float&  operator()(size_t y, size_t x) { return mMatrix[y * 4 + x]; }
     Matrix4 operator*(Matrix4& rhs);
 
-    Vector3 matMultVec(Vector3& vec, float w);
+    Vector3 matMultVec(Vector3& vec);
 
     void printMat();
 
@@ -36,7 +36,7 @@ public:
     Matrix4 static lookAt(Vector3& position, Vector3& target, Vector3& temp);
 
     // 2D to 3D projection matrix
-    Matrix4 static makeProjectionMatrix(float fov, float far, float near);
+    Matrix4 static makeProjectionMatrix(float fov, float AR, float near, float far);
 
 private:
     Matrix4() {};
