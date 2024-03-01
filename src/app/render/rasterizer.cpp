@@ -24,15 +24,18 @@ void Rasterizer::makeCoolPattern()
 
 void Rasterizer::drawModels(Model* models)
 {
-    Uint32 white = SDL_MapRGBA(mappingFormat, 0xFF, 0xFF, 0xFF, 0xFF);
-    Uint32 red   = SDL_MapRGBA(mappingFormat, 0xFF, 0x00, 0x00, 0xFF);
-    Uint32 green = SDL_MapRGBA(mappingFormat, 0x00, 0xFF, 0x00, 0xFF);
-    Uint32 blue  = SDL_MapRGBA(mappingFormat, 0x00, 0x00, 0xFF, 0xFF);
-    for (Vector3 f : (models->getMesh()).faces)
+    Uint32                white     = SDL_MapRGBA(mappingFormat, 0xFF, 0xFF, 0xFF, 0xFF);
+    Uint32                red       = SDL_MapRGBA(mappingFormat, 0xFF, 0x00, 0x00, 0xFF);
+    Uint32                green     = SDL_MapRGBA(mappingFormat, 0x00, 0xFF, 0x00, 0xFF);
+    Uint32                blue      = SDL_MapRGBA(mappingFormat, 0x00, 0x00, 0xFF, 0xFF);
+    Mesh*                 modelMesh = models->getMesh();
+    std::vector<Vector3>* faces     = &modelMesh->faces;
+    std::vector<Vector3>* vertices  = &modelMesh->vertices;
+    for (Vector3 f : *faces)
     {
-        Vector3 v1 = (models->getMesh()).vertices[f.x - 1];
-        Vector3 v2 = (models->getMesh()).vertices[f.y - 1];
-        Vector3 v3 = (models->getMesh()).vertices[f.z - 1];
+        Vector3 v1 = (*vertices)[f.x - 1];
+        Vector3 v2 = (*vertices)[f.y - 1];
+        Vector3 v3 = (*vertices)[f.z - 1];
         drawLine(v1, v2, red);
         drawLine(v2, v3, green);
         drawLine(v1, v3, blue);
