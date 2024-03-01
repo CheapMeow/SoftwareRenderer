@@ -23,7 +23,7 @@ public:
 
     void loadModels();
 
-    void moveModels();
+    void moveModels(int dt);
 
 private:
     WindowManager FEWindowManager;
