@@ -1,7 +1,7 @@
 #include "engine.h"
-#include <string>
-
+#include <cmath>
 #include <stdio.h>
+#include <string>
 
 Engine::Engine() {}
 
@@ -59,7 +59,7 @@ void Engine::mainLoop()
         done = FEInputManager.processInput();
 
         // Update entities here in the future
-        // TO DO
+        moveModels();
 
         // Perform all render calculations and update screen
         FERenderManager.render(sceneModels);
@@ -77,4 +77,23 @@ void Engine::loadModels()
     sceneModels      = new Model(path);
 
     // sceneModels->describeMesh();
+}
+
+void Engine::moveModels()
+{
+    float theta  = 0.01;
+    float cosine = std::cos(theta);
+    float sine   = std::sin(theta);
+
+    Mesh*                 modelMesh = sceneModels->getMesh();
+    int                   size      = modelMesh->numVertices;
+    std::vector<Vector3>* vertices  = &modelMesh->vertices;
+
+    for (int i = 0; i < size; ++i)
+    {
+        float xOld       = (*vertices)[i].x;
+        float zOld       = (*vertices)[i].z;
+        (*vertices)[i].x = xOld * cosine + zOld * sine;
+        (*vertices)[i].z = -xOld * sine + zOld * cosine;
+    }
 }

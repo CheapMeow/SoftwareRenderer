@@ -73,16 +73,13 @@ void Rasterizer::drawLine(Vector3 vertex1, Vector3 vertex2, Uint32 color)
 
     for (int x = x1; x <= x2; x++)
     {
-        if ((x >= 0) && (y >= 0) && (x < mCanvas->mWidth) && (y < mCanvas->mHeight))
+        if (steep)
         {
-            if (steep)
-            {
-                setPixelColor(color, y, x);
-            }
-            else
-            {
-                setPixelColor(color, x, y);
-            }
+            setPixelColor(color, y, x);
+        }
+        else
+        {
+            setPixelColor(color, x, y);
         }
         error2 += derror2;
         if (error2 > dx)
@@ -95,8 +92,12 @@ void Rasterizer::drawLine(Vector3 vertex1, Vector3 vertex2, Uint32 color)
 
 void Rasterizer::setPixelColor(Uint32 color, int x, int y)
 {
-    int arrayCoordinates               = convertCoordinates(x, y);
-    mCanvas->mBuffer[arrayCoordinates] = color;
+    if ((x >= 0) && (y >= 0) && (x < mCanvas->mWidth) && (y < mCanvas->mHeight))
+    {
+        int arrayCoordinates = convertCoordinates(x, y);
+
+        mCanvas->mBuffer[arrayCoordinates] = color;
+    }
 }
 
 int Rasterizer::convertCoordinates(int x, int y) { return ((y * mCanvas->mWidth) + x); }
