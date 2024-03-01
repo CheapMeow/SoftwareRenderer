@@ -22,11 +22,13 @@ bool RenderManager::startUp(WindowManager WindowManager)
         }
         else
         {
-            if (!createBuffer())
+            if (!createCanvas())
             {
-                printf("Could not build buffer.\n");
+                printf("Could not build canvas.\n");
                 return false;
             }
+            // Create rasterizer to begin drawing
+            raster = new Rasterizer(mainCanvas);
             return true;
         }
     }
@@ -42,12 +44,14 @@ bool RenderManager::createScreenTexture()
     return true;
 }
 
-bool RenderManager::createBuffer()
+bool RenderManager::createCanvas()
 {
-    pixelCount = WindowManager::SCREEN_WIDTH * WindowManager::SCREEN_HEIGHT;
-    buffer1    = new Uint32[pixelCount];
-    SDL_memset(buffer1, 0, pixelCount * sizeof(Uint32));
-    return buffer1 != NULL;
+    int pixelCount = WindowManager::SCREEN_WIDTH * WindowManager::SCREEN_HEIGHT;
+    int pitch      = WindowManager::SCREEN_WIDTH * sizeof(Uint32);
+    mainCanvas     = new Canvas(
+        WindowManager::SCREEN_WIDTH, WindowManager::SCREEN_HEIGHT, pixelCount, pitch, new Uint32[pixelCount]);
+    SDL_memset(mainCanvas->mBuffer, 0, mainCanvas->mPixelCount * sizeof(Uint32));
+    return mainCanvas != NULL;
 }
 
 bool RenderManager::createRenderer(SDL_Window* window)
@@ -63,8 +67,9 @@ bool RenderManager::createRenderer(SDL_Window* window)
 
 void RenderManager::shutDown()
 {
-    delete[] buffer1;
-    buffer1 = nullptr;
+    delete raster;
+    delete mainCanvas->mBuffer;
+    delete mainCanvas;
     screenTexture.free();
     SDL_DestroyRenderer(mainRenderer);
     mainRenderer = nullptr;
@@ -77,10 +82,10 @@ void RenderManager::render()
     clearScreen();
 
     // Perform any modifications we want on the pixels
-    createPixelPattern();
+    raster->makeCoolPattern();
 
     // Apply the pixel change to the texture
-    screenTexture.updateTexture(buffer1);
+    screenTexture.updateTexture(mainCanvas->mBuffer);
 
     // Switch screen texture with back texture and re-draw
     updateScreen();
@@ -101,29 +106,24 @@ void RenderManager::clearScreen()
     SDL_RenderClear(mainRenderer);
 }
 
-void RenderManager::createPixelPattern()
-{
-    // Get window pixel format
-    SDL_PixelFormat* mappingFormat = SDL_AllocFormat(PIXEL_FORMAT);
+// void RenderManager::createPixelPattern(){
+//     //Get window pixel format
+//     SDL_PixelFormat *mappingFormat = SDL_AllocFormat (PIXEL_FORMAT);
 
-    // Set color data
-    Uint32 red   = SDL_MapRGBA(mappingFormat, 0xFF, 0x00, 0x00, 0x60);
-    Uint32 green = SDL_MapRGBA(mappingFormat, 0x00, 0xFF, 0x00, 0x80);
-    Uint32 blue  = SDL_MapRGBA(mappingFormat, 0x00, 0x00, 0xFF, 0xFF);
-    // Color in certain pixels
-    for (int i = 0; i < pixelCount; ++i)
-    {
-        if ((i % 50) == 0)
-        {
-            buffer1[i] = red;
-        }
-        if ((i % 1000) == 0)
-        {
-            buffer1[i] = green;
-        }
-        if ((i % 2000) == 0)
-        {
-            buffer1[i] = blue;
-        }
-    }
-}
+//     //Set color data
+//     Uint32 red = SDL_MapRGBA(mappingFormat, 0xFF,0x00,0x00,0x60);
+//     Uint32 green = SDL_MapRGBA(mappingFormat, 0x00,0xFF,0x00,0x80);
+//     Uint32 blue = SDL_MapRGBA(mappingFormat, 0x00,0x00,0xFF,0xFF);
+//     //Color in certain pixels
+//     for(int i = 0; i < pixelCount; ++i){
+//         if( (i % 50) == 0){
+//             buffer1[i] = red;
+//         }
+//         if((i % 1000) == 0){
+//             buffer1[i] = green;
+//         }
+//         if((i % 2000) == 0){
+//             buffer1[i] = blue;
+//         }
+//     }
+// }

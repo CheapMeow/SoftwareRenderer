@@ -2,14 +2,16 @@
 #define RENDERMANAGER_H
 
 #include "SDL.h"
+#include "render/canvas.h"
+#include "render/rasterizer.h"
 #include "structs/texture.h"
 #include "windowManager.h"
+
 
 class RenderManager
 {
 
 public:
-    static const Uint32 PIXEL_FORMAT = SDL_PIXELFORMAT_RGBA8888;
     RenderManager();
 
     ~RenderManager();
@@ -24,19 +26,17 @@ public:
 
     void updateScreen();
 
-    bool createBuffer();
+    bool createCanvas();
 
     void render();
-
-    void createPixelPattern();
 
     void shutDown();
 
 private:
-    int           pixelCount;
-    Uint32*       buffer1;
     SDL_Renderer* mainRenderer;
     Texture       screenTexture;
+    Canvas*       mainCanvas;
+    Rasterizer*   raster;
 };
 
 #endif
