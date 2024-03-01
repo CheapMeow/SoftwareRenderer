@@ -52,6 +52,7 @@ void Engine::mainLoop()
 
     while (!done)
     {
+        unsigned int start = SDL_GetTicks();
         ++count;
 
         // Handle all user input
@@ -62,9 +63,9 @@ void Engine::mainLoop()
 
         // Perform all render calculations and update screen
         FERenderManager.render(sceneModels);
-
-        SDL_Delay(500);
-        printf("Loop Iteration N:%d\n", count);
+        unsigned int end = SDL_GetTicks();
+        // SDL_Delay(100);
+        printf("%2.1d: Loop elapsed time (ms):%d\n", count, end - start);
     }
 }
 
