@@ -26,6 +26,10 @@ private:
     // Dimensions
     int mWidth;
     int mHeight;
+
+    // Only used to lock and unlock pixels, not  the actual pixel
+    // values
+    void* mPixels;
 };
 
 #endif

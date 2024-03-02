@@ -1,2 +1,13 @@
 # SoftwareRenderer
-Software renderering
+
+## 画线
+
+Bresenham 画线算法
+
+## 画三角形
+
+给定三个点，获得缓冲的一个 bbox，遍历 bbox 内的每个像素点，三角形顶点到像素点的向量和三角形的边向量做叉乘
+
+都是同一个方向，说明点在三角形内，那么就可以填充
+
+这就就完成了在一个 bbox 内填充一个三角形

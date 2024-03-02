@@ -97,6 +97,7 @@ void RenderManager::render(Model* models, Matrix4& viewMatrix)
     std::vector<Vector3>* faces     = &modelMesh->faces;
     std::vector<Vector3>* vertices  = &modelMesh->vertices;
 
+    // Kind of a vertex shader I guess?
     for (Vector3 f : *faces)
     {
         Vector3 v1 = viewProjectionMatrix.matMultVec((*vertices)[f.x - 1]); //-1 because .obj file starts face count
@@ -109,11 +110,9 @@ void RenderManager::render(Model* models, Matrix4& viewMatrix)
         if (v3.x < -1 || v3.x > 1 || v3.y < -1 || v3.y > 1 || v3.z > 1 || v3.z < -1)
             continue;
 
-        raster->drawModels(v1, v2, v3);
+        // Rasterizing
+        raster->drawTriangles(v1, v2, v3);
     }
-
-    // Rasterizing
-
     // Apply the pixel changes and redraw
     updateScreen();
 }
