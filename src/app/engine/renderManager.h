@@ -18,25 +18,28 @@ public:
 
     bool startUp(WindowManager windowManager);
 
-    bool createRenderer(SDL_Window* mainWindow);
-
-    bool createScreenTexture();
-
-    void clearScreen();
-
-    void updateScreen();
-
-    bool createCanvas();
-
-    void render(Model* models);
+    void render(Model* models, Matrix4& mat);
 
     void shutDown();
 
 private:
+    // Init methods
+    bool createRenderer(SDL_Window* mainWindow);
+    bool createCanvas();
+    bool createScreenTexture();
+    void createProjectionMatrix();
+
+    // Rendering pipeline stuff
+    void clearScreen();
+    void updateScreen();
+
+    // Per vertex stuff
+
     SDL_Renderer* mainRenderer;
     Texture       screenTexture;
     Canvas*       mainCanvas;
     Rasterizer*   raster;
+    Matrix4       projectionMatrix;
 };
 
 #endif
