@@ -13,7 +13,7 @@ public:
         : mCanvas(canvas)
     {}
 
-    void drawModels(Model* models);
+    void drawModels(Vector3& v1, Vector3& v2, Vector3& v3);
 
     void makeCoolPattern();
 
