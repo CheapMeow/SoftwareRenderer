@@ -5,7 +5,7 @@ Scene::Scene(std::string path) { emptyScene = loadSceneModels(path); }
 
 Scene::~Scene()
 {
-    // Making sure you don't attempt to delete models that don't exists
+    // Making sure you don't attempt to delete models that don't exist
     if (!emptyScene)
     {
         for (Model* models : modelsInScene)
@@ -29,8 +29,8 @@ void Scene::update()
 bool Scene::loadSceneModels(std::string& path)
 {
     // In the future I want to read all o the models in the model folder
-    // And build them here.  For now only one
-    std::string fullPath = "../../../resources/models/";
+    // And build them here. For now only one is loaded.
+    std::string fullPath = "../models/";
     fullPath             = fullPath + path;
 
     if (!OBJ::fileExists(fullPath))
@@ -40,16 +40,9 @@ bool Scene::loadSceneModels(std::string& path)
     }
     else
     {
-        modelsInScene.push_back(new Model(fullPath));
-
-        // We also initialize the model position here position here
         TransformParameters initParameters;
-        // initParameters.scaling = Vector3(1, 60, 60);
-        // initParameters.rotation = Vector3(0,0,0);
         initParameters.translation = Vector3(0, -1.5, 0);
-        modelsInScene[0]->initPosition(initParameters);
-
-        // sceneModel->describeMesh();
+        modelsInScene.push_back(new Model(fullPath, initParameters));
         return false;
     }
 }

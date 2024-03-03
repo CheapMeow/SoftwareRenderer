@@ -2,9 +2,10 @@
 #include "math/vector3.h"
 #include <limits>
 
-Model::Model(std::string path)
+Model::Model(std::string path, TransformParameters& initParameters)
 {
     OBJ::buildMeshFromFile(mMesh, path);
+    initPosition(initParameters);
     buildBoundaryBox();
 }
 
@@ -89,4 +90,5 @@ void Model::buildBoundaryBox()
     mBounds.mMinZ = minZ;
 }
 
+// TO DO
 void Model::update() {}

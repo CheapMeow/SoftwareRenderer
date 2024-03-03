@@ -5,7 +5,6 @@
 
 Vector3 Matrix4::matMultVec(Vector3& vec)
 {
-
     Vector3 newVec(0, 0, 0);
     float   w2 = 0;
     newVec.x   = vec.x * (*this)(0, 0) + vec.y * (*this)(0, 1) + vec.z * (*this)(0, 2) +
@@ -22,8 +21,6 @@ Vector3 Matrix4::matMultVec(Vector3& vec)
 
     // Division is expensive, only do it if you need it
     // Also here is where perspective divide happens!
-    // vec.print();
-    // printf("%f\n",w2);
     if (w2 != 1)
     {
         newVec.x /= w2;
@@ -34,7 +31,65 @@ Vector3 Matrix4::matMultVec(Vector3& vec)
     return newVec;
 }
 
-Matrix4 Matrix4::makeFullRotMat(float alpha, float beta, float gamma)
+// Way too general, should probably change in the future since I think
+// I'll only need 4x4 stuff and this technically allows for any n matrix.
+// Traverse the matrix cell by cell and find the final value through a step of
+// sub multiplications that are then added together
+Matrix4 Matrix4::operator*(Matrix4& rhs)
+{
+    // Matrix dimensions
+    Matrix4 results;
+    int     n = 4;
+    for (int rows = 0; rows < n; ++rows)
+    {
+        for (int cols = 0; cols < n; ++cols)
+        {
+            float total = 0;
+            // total value of multiplication with all submultiplications added together
+            // sub represents submultiplications in the actual matrix multiplication
+            // For a nxn matrix you have n submultiplications
+            for (int sub = 1; sub < n + 1; ++sub)
+            {
+                int rowLhs = rows;    // row ind left matrix
+                int colLhs = sub - 1; // col ind left matrix
+                int rowRhs = sub - 1; // row ind right matrix
+                int colRhs = cols;    // col ind right matrix
+
+                total += (*this)(rowLhs, colLhs) * rhs(rowRhs, colRhs);
+            }
+            results(rows, cols) = total;
+        }
+    }
+    return results;
+}
+
+Matrix4 Matrix4::makeTestMat()
+{
+    Matrix4 testMat;
+    int     n   = 4;
+    int     val = 1;
+    for (int rows = 0; rows < n; ++rows)
+    {
+        for (int cols = 0; cols < n; ++cols)
+        {
+            testMat(rows, cols) = val;
+            ++val;
+        }
+    }
+    return testMat;
+}
+
+Matrix4 Matrix4::unitMatrix()
+{
+    Matrix4 testMat;
+    testMat(0, 0) = 1;
+    testMat(1, 1) = 1;
+    testMat(2, 2) = 1;
+    testMat(3, 3) = 1;
+    return testMat;
+}
+// Uses ZYX convention for rotation
+Matrix4 Matrix4::fullRotMat(float alpha, float beta, float gamma)
 {
     Matrix4 rotMat;
     float   cosA = std::cos(alpha);
@@ -67,7 +122,7 @@ Matrix4 Matrix4::makeFullRotMat(float alpha, float beta, float gamma)
     return rotMat;
 }
 
-Matrix4 Matrix4::makeScaleMat(float scaleX, float scaleY, float scaleZ)
+Matrix4 Matrix4::scaleMat(float scaleX, float scaleY, float scaleZ)
 {
     Matrix4 scaleMat;
     scaleMat(0, 0) = scaleX;
@@ -77,7 +132,7 @@ Matrix4 Matrix4::makeScaleMat(float scaleX, float scaleY, float scaleZ)
     return scaleMat;
 }
 
-Matrix4 Matrix4::makeTranslateMat(float dx, float dy, float dz)
+Matrix4 Matrix4::translateMat(float dx, float dy, float dz)
 {
     Matrix4 transMat;
     transMat(0, 0) = 1;
@@ -87,127 +142,23 @@ Matrix4 Matrix4::makeTranslateMat(float dx, float dy, float dz)
     transMat(1, 3) = dy;
     transMat(2, 3) = dz;
     transMat(3, 3) = 1;
-
     return transMat;
-}
-
-Matrix4 Matrix4::makeTestMat()
-{
-    Matrix4 testMat;
-    int     n   = 4;
-    int     val = 1;
-    for (int rows = 0; rows < n; ++rows)
-    {
-        for (int cols = 0; cols < n; ++cols)
-        {
-            testMat(rows, cols) = val;
-            ++val;
-        }
-    }
-    return testMat;
-}
-
-Matrix4 Matrix4::unitMatrix()
-{
-    Matrix4 testMat;
-    testMat(0, 0) = 1;
-    testMat(1, 1) = 1;
-    testMat(2, 2) = 1;
-    testMat(3, 3) = 1;
-    return testMat;
-}
-
-void Matrix4::printMat()
-{
-    int n = 4;
-    for (int rows = 0; rows < n; ++rows)
-    {
-        for (int cols = 0; cols < n; ++cols)
-        {
-            float val = (*this)(rows, cols);
-            printf("%f\t", val);
-        }
-        printf("\n");
-    }
-    printf("\n");
-}
-
-// Way too general, should probably change in the future since I think
-// I'll only need 4x4 stuff and this technically allows for any n matrix.
-// Traverse the matrix cell by cell and find the final value through a step of
-// sub multiplications that are then added together
-Matrix4 Matrix4::operator*(Matrix4& rhs)
-{
-    // Matrix dimensions
-    Matrix4 results;
-    int     n = 4;
-
-    for (int rows = 0; rows < n; ++rows)
-    {
-        for (int cols = 0; cols < n; ++cols)
-        {
-            float total = 0;
-            // total value of multiplication with all submultiplications added together
-
-            // sub represents submultiplications in the actual matrix multiplication
-            // For a nxn matrix you have n submultiplications
-
-            for (int sub = 1; sub < n + 1; ++sub)
-            {
-                int rowLhs = rows;    // row ind left matrix
-                int colLhs = sub - 1; // col ind left matrix
-
-                int rowRhs = sub - 1; // row ind right matrix
-                int colRhs = cols;    // col ind right matrix
-
-                total += (*this)(rowLhs, colLhs) * rhs(rowRhs, colRhs);
-            }
-
-            // Setting the specific row and column to the total value of the subm-
-            // multiplications for that specifc cell of the matrix
-            results(rows, cols) = total;
-        }
-    }
-    return results;
 }
 
 Matrix4 Matrix4::transformMatrix(TransformParameters transform)
 {
-    Matrix4 rotMatrix   = Matrix4::makeFullRotMat(transform.rotation.x, transform.rotation.y, transform.rotation.z);
-    Matrix4 scaleMatrix = Matrix4::makeScaleMat(transform.scaling.x, transform.scaling.y, transform.scaling.z);
+    Matrix4 rotMatrix   = Matrix4::fullRotMat(transform.rotation.x, transform.rotation.y, transform.rotation.z);
+    Matrix4 scaleMatrix = Matrix4::scaleMat(transform.scaling.x, transform.scaling.y, transform.scaling.z);
     Matrix4 translationMatrix =
-        Matrix4::makeTranslateMat(transform.translation.x, transform.translation.y, transform.translation.z);
+        Matrix4::translateMat(transform.translation.x, transform.translation.y, transform.translation.z);
+
     Matrix4 temp = (rotMatrix * scaleMatrix);
     return translationMatrix * (temp);
 }
 
-Matrix4 Matrix4::makeProjectionMatrix(float fov, float AR, float near, float far)
-{
-    float tanHalfFOVYInverse = 1 / tan((fov / 2) * (M_PI / 180));
-    // float bot   =  -top;
-    // float right =  top * AR;
-    // float left  =  bot * AR;
-    Matrix4 projectionMat;
-
-    // First Row
-    projectionMat(0, 0) = 1.0f * tanHalfFOVYInverse;
-
-    // Second row
-    projectionMat(1, 1) = AR * tanHalfFOVYInverse;
-
-    // Third row (Mine calculated for 1- 0)
-    projectionMat(2, 2) = (near) / (far - near);
-    projectionMat(2, 3) = (far * near) / (far - near);
-
-    // Fourth row
-    projectionMat(3, 2) = -1;
-
-    return projectionMat;
-}
-
 Matrix4 Matrix4::lookAt(Vector3& position, Vector3& target, Vector3& temp)
 {
-
+    // Gram–Schmidt_process
     Vector3 forward = (position - target).normalized();
     Vector3 side    = (temp.crossProduct(forward)).normalized();
     Vector3 up      = forward.crossProduct(side);
@@ -225,13 +176,13 @@ Matrix4 Matrix4::lookAt(Vector3& position, Vector3& target, Vector3& temp)
     worldToCam(0, 2) = side.z;
     worldToCam(0, 3) = -side.dotProduct(position);
 
-    // First row
+    // Second row
     worldToCam(1, 0) = up.x;
     worldToCam(1, 1) = up.y;
     worldToCam(1, 2) = up.z;
     worldToCam(1, 3) = -up.dotProduct(position);
 
-    // First row
+    // Third row
     worldToCam(2, 0) = forward.x;
     worldToCam(2, 1) = forward.y;
     worldToCam(2, 2) = forward.z;
@@ -241,4 +192,40 @@ Matrix4 Matrix4::lookAt(Vector3& position, Vector3& target, Vector3& temp)
     worldToCam(3, 3) = 1;
 
     return worldToCam;
+}
+
+Matrix4 Matrix4::projectionMatrix(float fov, float AR, float near, float far)
+{
+    Matrix4 projectionMat;
+    float   tanHalfFOVInverse = 1 / tan((fov / 2) * (M_PI / 180));
+
+    // First Row
+    projectionMat(0, 0) = tanHalfFOVInverse; // near/right
+
+    // Second row
+    projectionMat(1, 1) = AR * tanHalfFOVInverse; // near / top (top = right /AR)
+
+    // Third row (Calculated for 1- 0)
+    projectionMat(2, 2) = (near) / (far - near);
+    projectionMat(2, 3) = (far * near) / (far - near);
+
+    // Fourth row
+    projectionMat(3, 2) = -1;
+
+    return projectionMat;
+}
+
+void Matrix4::print()
+{
+    int n = 4;
+    for (int rows = 0; rows < n; ++rows)
+    {
+        for (int cols = 0; cols < n; ++cols)
+        {
+            float val = (*this)(rows, cols);
+            printf("%f\t", val);
+        }
+        printf("\n");
+    }
+    printf("\n");
 }

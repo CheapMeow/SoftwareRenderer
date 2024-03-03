@@ -26,6 +26,7 @@ bool InputManager::processInput()
     return done;
 }
 
+// TODO all input handling will go here
 bool InputManager::handleEvent(SDL_Event* event)
 {
     if (event->type == SDL_QUIT)

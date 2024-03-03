@@ -2,8 +2,8 @@
 #include "render/model.h"
 #include <vector>
 
+// Dummy constructors / Destructors
 RenderManager::RenderManager() {}
-
 RenderManager::~RenderManager() {}
 
 bool RenderManager::startUp(DisplayManager& displayManager, SceneManager& sceneManager)
@@ -27,12 +27,12 @@ void RenderManager::shutDown()
 
 void RenderManager::render()
 {
-
     // Clear screen and reset current buffers
     screen->clear();
     renderInstance.clearBuffers();
 
-    // Build a render Queue for drawing multiple models and assign camera
+    // Build a render Queue for drawing multiple models
+    // Also assigns the current camera to the software renderer
     buildRenderQueue();
 
     // Draw all meshes in the render queue so far we assume they are
@@ -51,15 +51,9 @@ void RenderManager::render()
     renderInstance.setCameraToRenderFrom(nullptr);
 }
 
-bool RenderManager::initSoftwareRenderer()
-{
-    int w = DisplayManager::SCREEN_WIDTH;
-    int h = DisplayManager::SCREEN_HEIGHT;
-    return renderInstance.startUp(w, h);
-}
-
 // Gets the list of visible models from the current scene and
-// extracts a list of pointers to their meshes. Also
+// extracts a list of pointers to their meshes.
+// Done every frame in case scene changes
 void RenderManager::buildRenderQueue()
 {
 
@@ -67,6 +61,7 @@ void RenderManager::buildRenderQueue()
     Scene* currentScene = sceneLocator->getCurrentScene();
     renderInstance.setCameraToRenderFrom(currentScene->getCurrentCamera());
 
+    // Get pointers to the visible models
     std::vector<Model*>* visibleModels = currentScene->getVisiblemodels();
 
     // Builds render queue from visibleModels list
@@ -74,4 +69,11 @@ void RenderManager::buildRenderQueue()
     {
         renderQueue.push(model->getMesh());
     }
+}
+
+bool RenderManager::initSoftwareRenderer()
+{
+    int w = DisplayManager::SCREEN_WIDTH;
+    int h = DisplayManager::SCREEN_HEIGHT;
+    return renderInstance.startUp(w, h);
 }

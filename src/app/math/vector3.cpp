@@ -1,6 +1,7 @@
 #include "vector3.h"
 #include <cmath>
 
+// Scalar-vector stuff
 Vector3& Vector3::operator-()
 {
     x = -x;
@@ -9,11 +10,21 @@ Vector3& Vector3::operator-()
     return *this;
 }
 
+Vector3 Vector3::operator*(float rhs) { return Vector3(this->x * rhs, this->y * rhs, this->z * rhs); }
+
+// Vector-vector operations
 Vector3 Vector3::operator-(Vector3& rhs) { return Vector3(this->x - rhs.x, this->y - rhs.y, this->z - rhs.z); }
 
 Vector3 Vector3::operator+(Vector3& rhs) { return Vector3(this->x + rhs.x, this->y + rhs.y, this->z + rhs.z); }
 
-Vector3 Vector3::operator*(float rhs) { return Vector3(this->x * rhs, this->y * rhs, this->z * rhs); }
+Vector3 Vector3::crossProduct(Vector3& rhs)
+{
+    Vector3 temp;
+    temp.x = ((this->y) * rhs.z) - (this->z) * rhs.y;
+    temp.y = ((this->z) * rhs.x) - (this->x) * rhs.z;
+    temp.z = ((this->x) * rhs.y) - (this->y) * rhs.x;
+    return temp;
+}
 
 Vector3& Vector3::normalized()
 {
@@ -27,19 +38,10 @@ Vector3& Vector3::normalized()
     }
     else
     {
-        // Deal with this at some point!
-        // printf("Your vector is all zeros!!\n");
+        // Deal with this more nicely at some point!
+        printf("Your vector is all zeros!!\n");
     }
     return *this;
-}
-
-Vector3 Vector3::crossProduct(Vector3& rhs)
-{
-    Vector3 temp;
-    temp.x = (this->y) * rhs.z - (this->z) * rhs.y;
-    temp.y = (this->z) * rhs.x - (this->x) * rhs.z;
-    temp.z = (this->x) * rhs.y - (this->y) * rhs.x;
-    return temp;
 }
 
 float Vector3::dotProduct(Vector3& rhs) { return (this->x) * rhs.x + (this->y) * rhs.y + (this->z) * rhs.z; }

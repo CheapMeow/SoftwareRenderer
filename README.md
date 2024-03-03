@@ -34,15 +34,17 @@ Bresenham 画线算法
 
 摄像机和物体的容器
 
+执行视锥体裁剪，来确定哪些物体将会被提交到 RenderManager 的队列
+
 ## 管理器
 
 SceneManager 负责场景的加载和切换
 
 RenderManager 负责处理渲染队列
 
-SoftwareRenderer 负责渲染单位物体，模拟顶点着色和片元着色
+SoftwareRenderer 负责渲染单位物体，调用顶点着色，调用 Rasterizer 渲染图元
 
-Rasterizer 负责渲染图元
+Rasterizer 负责渲染图元，进行深度测试，然后进行片元着色
 
 ## 片元着色器
 

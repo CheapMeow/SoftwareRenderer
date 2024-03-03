@@ -1,7 +1,7 @@
 #include "engine.h"
 
+// Dummy constructors and destructors
 Engine::Engine() {}
-
 Engine::~Engine() {}
 
 // Starts up subsystems in an order that satifies their dependencies
@@ -47,17 +47,17 @@ bool Engine::startUp()
 // Closing in opposite order to avoid dangling pointers
 void Engine::shutDown()
 {
-    printf("Closing input manager.\n");
     gInputManager.shutDown();
+    printf("Closed input manager.\n");
 
-    printf("Closing renderer manager.\n");
     gRenderManager.shutDown();
+    printf("Closed renderer manager.\n");
 
-    printf("Closing Scene manager.\n");
     gSceneManager.shutDown();
+    printf("Closed Scene manager.\n");
 
-    printf("Closing display manager.\n");
     gDisplayManager.shutDown();
+    printf("Closed display manager.\n");
 }
 
 // Runs main application loop and allows for scene changes
@@ -68,7 +68,7 @@ void Engine::run()
     bool done        = false;
     bool switchScene = false;
 
-    // Counters
+    // Iteration and time keeping counters
     int          count = 0;
     unsigned int end   = 0;
     unsigned int start = 0;
@@ -96,12 +96,13 @@ void Engine::run()
         // Handle all user input
         done = gInputManager.processInput();
 
-        // Update all models and camera in the current scene
+        // Update all models, camera and lighting in the current scene
         gSceneManager.update();
 
         // Update Rendering Queue and draw each item
         gRenderManager.render();
 
+        // Stats about frame
         end = SDL_GetTicks();
         printf("%2.1d: Loop elapsed time (ms):%d\n", count, end - start);
     }
