@@ -5,9 +5,16 @@
 
 struct Vector3
 {
-    float x;
-    float y;
-    float z;
+    union
+    {
+        float data[3];
+        struct
+        {
+            float x;
+            float y;
+            float z;
+        };
+    };
 
     Vector3(float x1, float y1, float z1)
         : x(x1)
@@ -25,8 +32,12 @@ struct Vector3
 
     Vector3 operator-(Vector3& rhs);
 
+    Vector3 operator+(Vector3& rhs);
+
+    Vector3 operator*(float rhs);
+
     // Accessing components using array notation for looping
-    float& operator[](int i);
+    // float &operator[](int i);
 
     Vector3& normalized();
 

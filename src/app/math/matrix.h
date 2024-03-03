@@ -38,6 +38,8 @@ public:
     // 2D to 3D projection matrix
     Matrix4 static makeProjectionMatrix(float fov, float AR, float near, float far);
 
+    Matrix4 static unitMatrix();
+
     Matrix4() {};
 
 private:
