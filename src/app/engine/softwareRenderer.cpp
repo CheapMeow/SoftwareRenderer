@@ -71,7 +71,7 @@ void SoftwareRenderer::drawTriangularMesh(Mesh* triMesh)
     Vector3 normalPrim[3];
 
     // Initializing shader
-    FlatShader shader;
+    GouraudShader shader;
 
     // Basic light direction
 
@@ -85,10 +85,7 @@ void SoftwareRenderer::drawTriangularMesh(Mesh* triMesh)
         // printf("\nCurrent Face: %d\n",j);
         Vector3 f = (*vIndices)[j];
         Vector3 n = (*nIndices)[j];
-        // printf("Vertices\n");
-        // f.print();
-        // printf("Normals\n");
-        // n.print();
+
         // Pack vertices together into an array
         buildTri(f, trianglePrimitive, *vertices);
         buildTri(n, normalPrim, *normals);
@@ -97,9 +94,9 @@ void SoftwareRenderer::drawTriangularMesh(Mesh* triMesh)
         if (backFaceCulling(trianglePrimitive))
             continue;
 
-        Vector3 N1 = trianglePrimitive[1] - trianglePrimitive[0];
-        Vector3 N2 = trianglePrimitive[2] - trianglePrimitive[0];
-        Vector3 N  = (N2.crossProduct(N1)).normalized();
+        // Vector3 N1 = trianglePrimitive[1] - trianglePrimitive[0];
+        // Vector3 N2 = trianglePrimitive[2] - trianglePrimitive[0];
+        // Vector3 N  = (N1.crossProduct(N2)).normalized();
 
         // Apply vertex shader
         for (int i = 0; i < 3; ++i)
@@ -107,8 +104,9 @@ void SoftwareRenderer::drawTriangularMesh(Mesh* triMesh)
             // trianglePrimitive[i].print();
             // normalPrim[i].print();
             // printf("\n");
-            Vector3 normal       = (mCamera->viewMatrix).matMultVec(N);
-            trianglePrimitive[i] = shader.vertex(trianglePrimitive[i], MVP, N, lightDir.normalized(), i);
+            // Vector3 normal = (mCamera->viewMatrix).matMultVec(N);
+            trianglePrimitive[i] =
+                shader.vertex(trianglePrimitive[i], MVP, normalPrim[i].normalized(), lightDir.normalized(), i);
         }
 
         // Clipping should occur here
