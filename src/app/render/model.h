@@ -15,6 +15,8 @@ public:
     Mesh* getMesh();
     void  initPosition(TransformParameters initPos);
 
+    void update();
+
 private:
     void   buildBoundaryBox();
     void   buildMesh(std::string path);

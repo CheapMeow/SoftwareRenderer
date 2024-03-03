@@ -164,3 +164,5 @@ void Model::buildBoundaryBox()
     mBounds.mMinY = minY;
     mBounds.mMinZ = minZ;
 }
+
+void Model::update() {}
