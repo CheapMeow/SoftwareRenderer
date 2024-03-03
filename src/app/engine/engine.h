@@ -4,8 +4,8 @@
 // Headers
 #include "displayManager.h"
 #include "inputManager.h"
+#include "renderManager.h"
 #include "sceneManager.h"
-#include "softwareRenderer.h"
 
 
 // Minimal graphics engine application
@@ -27,10 +27,10 @@ public:
     void run();
 
 private:
-    DisplayManager   gDisplayManager;
-    SoftwareRenderer gRenderer;
-    InputManager     gInputManager;
-    SceneManager     gSceneManager;
+    DisplayManager gDisplayManager;
+    RenderManager  gRenderManager;
+    InputManager   gInputManager;
+    SceneManager   gSceneManager;
 };
 
 #endif

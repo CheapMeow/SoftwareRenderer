@@ -5,7 +5,7 @@
 Camera::Camera()
 {
     viewMatrix       = Matrix4::lookAt(position, target, up);
-    aspectRatio      = DisplayManager::SCREEN_WIDTH / DisplayManager::SCREEN_WIDTH;
+    aspectRatio      = DisplayManager::SCREEN_WIDTH / (float)DisplayManager::SCREEN_HEIGHT;
     projectionMatrix = Matrix4::makeProjectionMatrix(fov, aspectRatio, near, far);
 }
 
@@ -19,5 +19,5 @@ void Camera::update()
     position.y   = 0;
     position.z   = camZ;
     viewMatrix   = Matrix4::lookAt(position, target, up);
-    // viewMatrix = (Matrix4::makeTranslateMat(0,camX*0.25,0)*viewMatrix)
+    viewMatrix   = (Matrix4::makeTranslateMat(0, camX * 0.25, 0) * viewMatrix);
 }

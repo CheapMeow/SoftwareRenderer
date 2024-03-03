@@ -11,10 +11,11 @@ class Model
 
 public:
     Model(std::string path);
-    void  describeMesh();
-    Mesh* getMesh();
-    void  initPosition(TransformParameters initPos);
+    void describeMesh();
 
+    Mesh* getMesh();
+
+    void initPosition(TransformParameters initPos);
     void update();
 
 private:

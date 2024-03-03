@@ -1,7 +1,31 @@
 #include "vector3.h"
 #include <cmath>
 
+Vector3& Vector3::operator-()
+{
+    x = -x;
+    y = -y;
+    z = -z;
+    return *this;
+}
+
 Vector3 Vector3::operator-(Vector3& rhs) { return Vector3(this->x - rhs.x, this->y - rhs.y, this->z - rhs.z); }
+
+float& Vector3::operator[](int i)
+{
+    if (i == 0)
+    {
+        return x;
+    }
+    else if (i == 1)
+    {
+        return y;
+    }
+    else if (i == 2)
+    {
+        return z;
+    }
+}
 
 Vector3& Vector3::normalized()
 {
@@ -35,9 +59,3 @@ float Vector3::dotProduct(Vector3& rhs) { return (this->x) * rhs.x + (this->y) *
 float Vector3::length() { return std::sqrt((this->x * this->x) + (this->y * this->y) + (this->z * this->z)); }
 
 void Vector3::print() { printf("Vec: %f\t%f\t%f\n", x, y, z); }
-
-Vector3 Vector3::neg()
-{
-    Vector3 negval(-this->x, -this->y, -this->z);
-    return negval;
-}

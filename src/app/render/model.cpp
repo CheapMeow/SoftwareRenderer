@@ -56,7 +56,7 @@ void Model::loadFaces(std::ifstream& file)
         if (f == "f")
         {
             iss >> x >> y >> z;
-            Vector3 face(x, y, z);
+            Vector3 face(std::stof(x) - 1, std::stof(y) - 1, std::stof(z) - 1);
             mMesh.faces.push_back(face);
         }
     }
@@ -67,7 +67,6 @@ void Model::loadFaces(std::ifstream& file)
 
 void Model::loadVertices(std::ifstream& file)
 {
-
     std::string line, v, x, y, z;
     while (!file.eof())
     {
@@ -77,7 +76,7 @@ void Model::loadVertices(std::ifstream& file)
         if (v == "v")
         {
             iss >> x >> y >> z;
-            Vector3 vertex(x, y, z);
+            Vector3 vertex(std::stof(x), std::stof(y), std::stof(z));
             mMesh.vertices.push_back(vertex);
         }
     }

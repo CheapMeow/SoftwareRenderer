@@ -2,6 +2,7 @@
 #define SCENEMANAGER_H
 
 #include "render/scene.h"
+
 // Add an enum in the future with the different scenes that it should be able to
 // render
 class SceneManager
@@ -21,6 +22,8 @@ public:
 
     // Update current scene
     void update();
+
+    Scene* getCurrentScene();
 
 private:
     bool loadScene();

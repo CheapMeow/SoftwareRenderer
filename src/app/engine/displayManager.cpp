@@ -21,14 +21,17 @@ bool DisplayManager::startUp()
         }
         else
         {
-            // if( !createSDLRenderer() ){
-            //     success = false;
-            // }
-            // else{
-            //     if( !createScreenTexture() ){
-            //         success = false;
-            //     }
-            // }
+            if (!createSDLRenderer())
+            {
+                success = false;
+            }
+            else
+            {
+                if (!createScreenTexture())
+                {
+                    success = false;
+                }
+            }
         }
     }
     return success;
@@ -36,15 +39,16 @@ bool DisplayManager::startUp()
 
 void DisplayManager::shutDown()
 {
-    // screenTexture.free();
+    mTexturePixels = nullptr;
 
-    // SDL_FreeSurface(surface);
+    SDL_DestroyTexture(mTexture);
+    mTexture = nullptr;
 
-    // SDL_DestroyRenderer(SDLRenderer);
-    // SDLRenderer = nullptr;
+    SDL_DestroyRenderer(mSDLRenderer);
+    mSDLRenderer = nullptr;
 
-    SDL_DestroyWindow(mainWindow);
-    mainWindow = nullptr;
+    SDL_DestroyWindow(mWindow);
+    mWindow = nullptr;
 
     SDL_Quit();
 }
@@ -61,10 +65,9 @@ bool DisplayManager::startSDL()
 
 bool DisplayManager::createWindow()
 {
-    mainWindow = SDL_CreateWindow(
+    mWindow = SDL_CreateWindow(
         "SoftwareRenderer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
-    surface = SDL_GetWindowSurface(mainWindow);
-    if (mainWindow == nullptr)
+    if (mWindow == nullptr)
     {
         printf("Could not create window. Error: %s\n", SDL_GetError());
         return false;
@@ -74,9 +77,8 @@ bool DisplayManager::createWindow()
 
 bool DisplayManager::createSDLRenderer()
 {
-    // SDLRenderer = SDL_CreateRenderer(mainWindow, -1, SDL_RENDERER_PRESENTVSYNC);
-    SDLRenderer = SDL_CreateSoftwareRenderer(surface);
-    if (SDLRenderer == nullptr)
+    mSDLRenderer = SDL_CreateRenderer(mWindow, -1, SDL_RENDERER_PRESENTVSYNC);
+    if (mSDLRenderer == nullptr)
     {
         printf("Could not create renderer context. Error: %s\n", SDL_GetError());
         return false;
@@ -86,7 +88,9 @@ bool DisplayManager::createSDLRenderer()
 
 bool DisplayManager::createScreenTexture()
 {
-    if (!screenTexture.createBlank(SDLRenderer, SCREEN_WIDTH, SCREEN_HEIGHT))
+    mTexture = SDL_CreateTexture(
+        mSDLRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
+    if (mTexture == NULL)
     {
         printf("Could not create texture. Error: %s\n", SDL_GetError());
         return false;
@@ -96,27 +100,27 @@ bool DisplayManager::createScreenTexture()
 
 void DisplayManager::clear()
 {
-    SDL_LockSurface(surface);
-    SDL_memset(surface->pixels, 0, surface->h * surface->pitch);
-    SDL_UnlockSurface(surface);
-    // SDL_SetRenderDrawColor(SDLRenderer, 0x00, 0x00, 0x00, 0xFF);
-    // SDL_RenderClear(SDLRenderer);
+    SDL_SetRenderDrawColor(mSDLRenderer, 0x00, 0x00, 0x00, 0xFF);
+    SDL_RenderClear(mSDLRenderer);
 }
 
-void DisplayManager::draw(Buffer<Uint32>* pixels)
+void DisplayManager::swapBuffers(Buffer<Uint32>* pixels)
 {
 
-    // screenTexture.update(pixels->buffer);
+    // Lock texture for manipulation
+    SDL_LockTexture(mTexture, NULL, &mTexturePixels, &mTexturePitch);
 
-    // //Render texture to screen
-    // screenTexture.renderToScreen(SDLRenderer);
+    // Copy pixels to texture memory PRETTY SLOW. FIX?
+    memcpy(mTexturePixels, pixels->buffer, SCREEN_HEIGHT * mTexturePitch);
 
-    // //Update screen to window
-    // SDL_RenderPresent( SDLRenderer );
+    // Unlocking texture to apply pixel changes
+    SDL_UnlockTexture(mTexture);
+    mTexturePixels = nullptr;
 
-    // Testing pure software rendering
-    SDL_LockSurface(surface);
-    memcpy(surface->pixels, pixels->buffer, pixels->mHeight * pixels->mPitch);
-    SDL_UnlockSurface(surface);
-    SDL_UpdateWindowSurface(mainWindow);
+    // Setting blendmode for copy operation to renderer backbuffer
+    SDL_SetTextureBlendMode(mTexture, SDL_BLENDMODE_BLEND);
+    SDL_RenderCopy(mSDLRenderer, mTexture, NULL, NULL);
+
+    // Update screen to window
+    SDL_RenderPresent(mSDLRenderer);
 }
