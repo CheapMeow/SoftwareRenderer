@@ -34,7 +34,7 @@ Bresenham 画线算法
 
 摄像机和物体的容器
 
-执行视锥体裁剪，来确定哪些物体将会被提交到 RenderManager 的队列
+执行物体层级的视锥体裁剪，来确定哪些物体将会被提交到 RenderManager 的队列
 
 ## 管理器
 
@@ -42,7 +42,9 @@ SceneManager 负责场景的加载和切换
 
 RenderManager 负责处理渲染队列
 
-SoftwareRenderer 负责渲染单位物体，调用顶点着色，调用 Rasterizer 渲染图元
+SoftwareRenderer 负责渲染单位物体，执行屏幕裁剪，调用顶点着色，执行透视除法，调用 Rasterizer 渲染图元
+
++ 屏幕裁剪就是判断三角形是不是三个点都在 NDC 空间或者说裁剪空间之外，感觉也可以是称为三角形层面的视锥剔除
 
 Rasterizer 负责渲染图元，进行深度测试，然后进行片元着色
 

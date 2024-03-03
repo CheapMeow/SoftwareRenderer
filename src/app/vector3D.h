@@ -44,6 +44,16 @@ struct Vector3
         , z(z1)
         , w(1) {};
 
+    // Homogenous coordinates to cartesian transformation
+    Vector3& perspectiveDivide()
+    {
+        x /= w;
+        y /= w;
+        z /= w;
+        w = 1;
+        return *this;
+    }
+
     // Scalar-vector operations
     Vector3& operator-()
     { // Negate components of vector
@@ -80,6 +90,10 @@ struct Vector3
             x *= factor;
             y *= factor;
             z *= factor;
+        }
+        else
+        {
+            printf("WARNING: Attempting to normalize a vector of length 0.\n");
         }
 
         return *this;
