@@ -8,7 +8,6 @@
 
 struct Camera
 {
-public:
     Camera();
 
     void update();
