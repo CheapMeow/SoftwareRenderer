@@ -60,6 +60,7 @@ void SoftwareRenderer::drawTriangularMesh(Mesh* triMesh)
 
     // Getting the vertices, faces
     std::vector<Vector3>* vIndices = &triMesh->vertexIndices;
+    std::vector<Vector3>* nIndices = &triMesh->normalsIndices;
     std::vector<Vector3>* vertices = &triMesh->vertices;
     std::vector<Vector3>* normals  = &triMesh->normals;
 
@@ -67,7 +68,7 @@ void SoftwareRenderer::drawTriangularMesh(Mesh* triMesh)
     Vector3 trianglePrimitive[3];
 
     // Initializing shader
-    GourardShader shader;
+    GouraudShader shader;
 
     // Building ModelViewProjection matrix
     Matrix4 MVP = (mCamera->projectionMatrix) * (mCamera->viewMatrix);

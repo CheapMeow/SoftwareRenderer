@@ -1,12 +1,11 @@
 #include "scene.h"
 #include "objParser.h"
 
-
 Scene::Scene(std::string path) { emptyScene = loadSceneModels(path); }
 
 Scene::~Scene()
 {
-
+    // Making sure you don't attempt to delete models that don't exists
     if (!emptyScene)
     {
         for (Model* models : modelsInScene)
