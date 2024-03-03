@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 
-
 class Scene
 {
 public:
@@ -21,8 +20,12 @@ public:
 
     Camera* getCurrentCamera();
 
+    bool checkIfEmpty();
+
 private:
     Camera mainCamera;
+
+    bool emptyScene;
 
     std::vector<Model*> modelsInScene;
 
@@ -30,7 +33,7 @@ private:
     std::vector<Model*> visibleModels;
 
     // Initializes all modelsin the scene
-    void loadSceneModels(std::string path);
+    bool loadSceneModels(std::string& path);
 
     // Cull objects that should not be visible and add the visible to the
     // visibleModels list for rendering TO DO

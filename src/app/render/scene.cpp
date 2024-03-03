@@ -1,12 +1,18 @@
 #include "scene.h"
+#include "objParser.h"
 
-Scene::Scene(std::string path) { loadSceneModels(path); }
+
+Scene::Scene(std::string path) { emptyScene = loadSceneModels(path); }
 
 Scene::~Scene()
 {
-    for (Model* models : modelsInScene)
+
+    if (!emptyScene)
     {
-        delete models;
+        for (Model* models : modelsInScene)
+        {
+            delete models;
+        }
     }
 }
 
@@ -21,23 +27,32 @@ void Scene::update()
     frustrumCulling();
 }
 
-void Scene::loadSceneModels(std::string path)
+bool Scene::loadSceneModels(std::string& path)
 {
     // In the future I want to read all o the models in the model folder
     // And build them here.  For now only one
     std::string fullPath = "../../../resources/models/";
     fullPath             = fullPath + path;
-    modelsInScene.push_back(new Model(fullPath));
 
-    // We also initialize the model position here position here
-    TransformParameters initParameters;
-    // initParameters.scaling = Vector3(1, 60, 60);
-    initParameters.rotation    = Vector3(0, 0, 0);
-    initParameters.translation = Vector3(0, -1, 0);
+    if (!OBJ::fileExists(fullPath))
+    {
+        printf("Error! File:%s does not exist.\n", path.c_str());
+        return true;
+    }
+    else
+    {
+        modelsInScene.push_back(new Model(fullPath));
 
-    modelsInScene[0]->initPosition(initParameters);
+        // We also initialize the model position here position here
+        TransformParameters initParameters;
+        // initParameters.scaling = Vector3(1, 60, 60);
+        // initParameters.rotation = Vector3(0,0,0);
+        initParameters.translation = Vector3(0, -3, 0);
+        modelsInScene[0]->initPosition(initParameters);
 
-    // sceneModel->describeMesh();
+        // sceneModel->describeMesh();
+        return false;
+    }
 }
 
 void Scene::frustrumCulling()
@@ -58,6 +73,8 @@ void Scene::frustrumCulling()
 std::vector<Model*>* Scene::getVisiblemodels() { return &visibleModels; }
 
 Camera* Scene::getCurrentCamera() { return &mainCamera; }
+
+bool Scene::checkIfEmpty() { return emptyScene; }
 
 // //If the frustrum culling returns true it means the model has been culled
 // //Because no other models are in the scene we return

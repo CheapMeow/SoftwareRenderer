@@ -4,11 +4,12 @@
 #include "math/bound3.h"
 #include "math/matrix.h"
 #include "mesh.h"
+#include "objParser.h"
 #include "string"
+
 
 class Model
 {
-
 public:
     Model(std::string path);
     void describeMesh();
@@ -20,10 +21,6 @@ public:
 
 private:
     void   buildBoundaryBox();
-    void   buildMesh(std::string path);
-    void   loadVertices(std::ifstream& fileHandle);
-    void   loadNormals(std::ifstream& fileHandle);
-    void   loadFaces(std::ifstream& fileHandle);
     Mesh   mMesh;
     Bound3 mBounds;
 };
