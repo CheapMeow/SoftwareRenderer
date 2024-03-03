@@ -88,7 +88,9 @@ void Engine::run()
                 break;
             }
             else
+            {
                 switchScene = false;
+            }
         }
 
         // Handle all user input

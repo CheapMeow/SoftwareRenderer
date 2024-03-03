@@ -23,7 +23,7 @@ bool SceneManager::switchScene() { return true; }
 bool SceneManager::loadScene()
 {
     bool success = true;
-    currentScene = new Scene("teapot.obj");
+    currentScene = new Scene("elephant.obj");
     return success;
 }
 

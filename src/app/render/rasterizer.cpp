@@ -137,7 +137,7 @@ void Rasterizer::drawTriangles(Vector3* vertices, IShader& shader, Buffer<Uint32
                     (*zBuffer)(x, y) = depth;
                     (*pixelBuffer)(x, y) =
                         SDL_MapRGBA(mappingFormat, rgbVals.data[0], rgbVals.data[1], rgbVals.data[2], 0xFF);
-                    ;
+                    // rgbVals.print();
                 }
             }
         }
