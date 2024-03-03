@@ -13,7 +13,7 @@ public:
         : mCanvas(canvas)
     {}
 
-    void drawTriangles(Vector3& v1, Vector3& v2, Vector3& v3);
+    void drawTriangles(Vector3& v1, Vector3& v2, Vector3& v3, float intensity);
 
     void drawWireFrame(Vector3& v1, Vector3& v2, Vector3& v3);
 

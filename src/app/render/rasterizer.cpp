@@ -36,8 +36,10 @@ void Rasterizer::testPattern()
 }
 
 // Should probably do something fancier in the future
-void Rasterizer::drawTriangles(Vector3& v0, Vector3& v1, Vector3& v2)
+void Rasterizer::drawTriangles(Vector3& v0, Vector3& v1, Vector3& v2, float intensity)
 {
+    Uint32 color = SDL_MapRGBA(mappingFormat, 256 * intensity, 256 * intensity, 256 * intensity, 0xFF);
+
     std::array<int, 3> xVerts;
     std::array<int, 3> yVerts;
     xVerts[0] = (v0.x + 1) * mCanvas->mWidth * 0.5;
@@ -55,18 +57,20 @@ void Rasterizer::drawTriangles(Vector3& v0, Vector3& v1, Vector3& v2)
     int xMin = *std::min_element(xVerts.begin(), xVerts.end());
     int yMin = *std::min_element(yVerts.begin(), yVerts.end());
 
-    for (int y = yMin; y < yMax; ++y)
+    for (int y = yMin; y <= yMax; ++y)
     {
-        for (int x = xMin; x < xMax; ++x)
+        for (int x = xMin; x <= xMax; ++x)
         {
             float edge1 = (x - xVerts[0]) * (yVerts[1] - yVerts[0]) - (xVerts[1] - xVerts[0]) * (y - yVerts[0]);
+
             float edge2 = (x - xVerts[1]) * (yVerts[2] - yVerts[1]) - (xVerts[2] - xVerts[1]) * (y - yVerts[1]);
+
             float edge3 = (x - xVerts[2]) * (yVerts[0] - yVerts[2]) - (xVerts[0] - xVerts[2]) * (y - yVerts[2]);
 
-            if (edge1 >= 0 && edge2 >= 0 && edge3 >= 0)
-            {
-                setPixelColor(white, x, y);
-            }
+            // If any of the edge functions are smaller than zero, discard the point
+            if (edge1 < 0 || edge2 < 0 || edge3 < 0)
+                continue;
+            setPixelColor(color, x, y);
         }
     }
 }
