@@ -3,17 +3,17 @@
 int main(int argc, char* argv[])
 {
 
-    Engine mainEngine;
-    if (mainEngine.startUp())
+    Engine SSGE; // Simple Software Graphics Engine
+    if (SSGE.startUp())
     {
-        mainEngine.loadModels();
-        mainEngine.mainLoop();
+        SSGE.loadModels();
+        SSGE.mainLoop();
     }
     else
     {
-        printf("Engine could not initialize successfully. Shutting down.\n");
+        printf("SSGE could not initialize successfully. Shutting down.\n");
     }
-    mainEngine.shutDown();
+    SSGE.shutDown();
 
     return 0;
 }

@@ -1,10 +1,10 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include "math/bound3.h"
 #include "math/matrix.h"
 #include "mesh.h"
 #include "string"
-
 
 class Model
 {
@@ -16,10 +16,12 @@ public:
     void  initPosition(TransformParameters initPos);
 
 private:
-    void buildMesh(std::string path);
-    void loadVertices(std::ifstream& fileHandle);
-    void loadFaces(std::ifstream& fileHandle);
-    Mesh mMesh;
+    void   buildBoundaryBox();
+    void   buildMesh(std::string path);
+    void   loadVertices(std::ifstream& fileHandle);
+    void   loadFaces(std::ifstream& fileHandle);
+    Mesh   mMesh;
+    Bound3 mBounds;
 };
 
 #endif

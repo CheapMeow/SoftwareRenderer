@@ -3,10 +3,15 @@
 #include "math/vector3.h"
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <sstream>
 #include <stdio.h>
 
-Model::Model(std::string path) { buildMesh(path); }
+Model::Model(std::string path)
+{
+    buildMesh(path);
+    buildBoundaryBox();
+}
 
 Mesh* Model::getMesh() { return &mMesh; }
 
@@ -62,6 +67,7 @@ void Model::loadFaces(std::ifstream& file)
 
 void Model::loadVertices(std::ifstream& file)
 {
+
     std::string line, v, x, y, z;
     while (!file.eof())
     {
@@ -91,4 +97,70 @@ void Model::initPosition(TransformParameters initVals)
     {
         (*vertices)[i] = modelMatrix.matMultVec((*vertices)[i]);
     }
+}
+
+// I know this is incredibly inefficient, I only need to do it once for now
+// If if I ever need something faster I will move this into the vertex loading
+// function and make use of the read there.
+void Model::buildBoundaryBox()
+{
+    float minX = std::numeric_limits<float>::max();
+    float maxX = std::numeric_limits<float>::min();
+
+    float minY = minX;
+    float maxY = maxX;
+
+    float minZ = minX;
+    float maxZ = maxX;
+
+    for (int i = 0; i < mMesh.numVertices; ++i)
+    {
+        float x = mMesh.vertices[i].x;
+        float y = mMesh.vertices[i].y;
+        float z = mMesh.vertices[i].z;
+
+        if (x > maxX)
+        {
+            maxX = x;
+        }
+        else
+        {
+            if (x < minX)
+            {
+                minX = x;
+            }
+        }
+
+        if (y > maxY)
+        {
+            maxY = y;
+        }
+        else
+        {
+            if (y < minY)
+            {
+                minY = y;
+            }
+        }
+
+        if (z > maxZ)
+        {
+            maxZ = z;
+        }
+        else
+        {
+            if (z < minZ)
+            {
+                minZ = z;
+            }
+        }
+    }
+
+    mBounds.mMaxX = maxX;
+    mBounds.mMaxY = maxY;
+    mBounds.mMaxZ = maxZ;
+
+    mBounds.mMinX = minX;
+    mBounds.mMinY = minY;
+    mBounds.mMinZ = minZ;
 }

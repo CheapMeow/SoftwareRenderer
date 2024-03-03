@@ -35,6 +35,9 @@ private:
 
     // Per vertex stuff
 
+    // Culling
+    bool frustrumCulling(Model* model, Matrix4& viewMatrix);
+
     SDL_Renderer* mainRenderer;
     Texture       screenTexture;
     Canvas*       mainCanvas;
