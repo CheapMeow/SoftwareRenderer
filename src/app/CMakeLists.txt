@@ -5,6 +5,8 @@ add_executable(${APP_NAME} ${APP_HEADER_FILES} ${APP_SOURCE_FILES})
 
 set_target_properties(${APP_NAME} PROPERTIES CXX_STANDARD 20)
 
+target_compile_definitions(${APP_NAME} PUBLIC _USE_MATH_DEFINES)
+
 target_include_directories(${APP_NAME} PUBLIC ./)
 
 target_link_libraries(${APP_NAME} PUBLIC SDL2main SDL2::SDL2)

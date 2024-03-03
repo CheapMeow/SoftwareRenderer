@@ -1,5 +1,6 @@
-#include "scene.h"
 #include "objParser.h"
+#include <scene.h>
+
 
 Scene::Scene(std::string path) { emptyScene = loadSceneModels(path); }
 
@@ -30,7 +31,7 @@ bool Scene::loadSceneModels(std::string& path)
 {
     // In the future I want to read all o the models in the model folder
     // And build them here. For now only one is loaded.
-    std::string fullPath = "../models/";
+    std::string fullPath = "../../../resources/models/";
     fullPath             = fullPath + path;
 
     if (!OBJ::fileExists(fullPath))
@@ -41,7 +42,7 @@ bool Scene::loadSceneModels(std::string& path)
     else
     {
         TransformParameters initParameters;
-        initParameters.translation = Vector3(0, -1.5, 0);
+        initParameters.translation = Vector3f(0, -1.5, 0);
         modelsInScene.push_back(new Model(fullPath, initParameters));
         return false;
     }
