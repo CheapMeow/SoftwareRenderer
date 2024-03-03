@@ -1,7 +1,6 @@
 #include "objParser.h"
 #include <scene.h>
 
-
 Scene::Scene(std::string path) { emptyScene = loadSceneModels(path); }
 
 Scene::~Scene()
@@ -54,7 +53,7 @@ void Scene::frustrumCulling()
     for (Model* model : modelsInScene)
     {
 
-        // TO DO Visibility check against camera's frustrum planes
+        visible = mainCamera.checkVisibility(model->getBounds());
 
         if (visible)
         {
@@ -68,15 +67,3 @@ std::vector<Model*>* Scene::getVisiblemodels() { return &visibleModels; }
 Camera* Scene::getCurrentCamera() { return &mainCamera; }
 
 bool Scene::checkIfEmpty() { return emptyScene; }
-
-// //If the frustrum culling returns true it means the model has been culled
-// //Because no other models are in the scene we return
-// // if (frustrumCulling(models, viewMatrix)){
-// //     printf("Model culled!\n");
-// //     return;
-// // }
-
-//     //stupid frustrum culling
-//     //if(v1.x < -1 || v1.x > 1 || v1.y < -1 || v1.y > 1 || v1.z > 1 || v1.z < -1) continue;
-//     //if(v2.x < -1 || v2.x > 1 || v2.y < -1 || v2.y > 1 || v2.z > 1 || v2.z < -1) continue;
-//     //if(v3.x < -1 || v3.x > 1 || v3.y < -1 || v3.y > 1 || v3.z > 1 || v3.z < -1) continue;

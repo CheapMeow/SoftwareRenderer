@@ -17,13 +17,6 @@ Vector3f Matrix4::matMultVec(Vector3f& vec)
     w2 = vec.x * (*this)(3, 0) + vec.y * (*this)(3, 1) + vec.z * (*this)(3, 2) +
          (*this)(3, 3); // Assuming wO of vec always  = 1
 
-    // Division is expensive, only do it if you need it
-    // Also here is where perspective divide happens!
-    //  if(w2 != 1){
-    //      newVec.x /= w2;
-    //      newVec.y /= w2;
-    //      newVec.z /= w2;
-    //  }
     newVec.w = w2;
 
     return newVec;

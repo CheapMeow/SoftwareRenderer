@@ -2,9 +2,9 @@
 #define BUFFER_H
 
 #include "SDL.h"
+#include <string>
 #include <type_traits>
 
-#include <string>
 
 // Templated struct to emulate GPU buffers such as
 // the frame buffer and the ZBuffer along with others
