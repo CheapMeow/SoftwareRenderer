@@ -6,8 +6,7 @@ int main(int argc, char* argv[])
     Engine SSGE; // Simple Software Graphics Engine
     if (SSGE.startUp())
     {
-        SSGE.loadModels();
-        SSGE.mainLoop();
+        SSGE.run();
     }
     else
     {

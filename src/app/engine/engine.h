@@ -2,38 +2,35 @@
 #define ENGINE_H
 
 // Headers
+#include "displayManager.h"
 #include "inputManager.h"
-#include "math/matrix.h"
-#include "render/model.h"
-#include "renderManager.h"
-#include "windowManager.h"
+#include "sceneManager.h"
+#include "softwareRenderer.h"
 
 
+// Minimal graphics engine application
 class Engine
 {
 
 public:
+    // Dummy constructors / Destructors
     Engine();
-
     ~Engine();
 
+    // I use these methods instead of constructors and destructors
+    // because I want to be able to control initialization order.
+    // You'll see the same idea applied to all subsystem level classes.
     bool startUp();
-
     void shutDown();
 
-    void mainLoop();
-
-    void loadModels();
-
-    // Will not be here forever
-    void updateCamera();
+    // Contains the scene switching logic and the main application loop
+    void run();
 
 private:
-    WindowManager FEWindowManager;
-    RenderManager FERenderManager;
-    InputManager  FEInputManager;
-    Model*        sceneModels;
-    Matrix4       viewMatrix;
+    DisplayManager   gDisplayManager;
+    SoftwareRenderer gRenderer;
+    InputManager     gInputManager;
+    SceneManager     gSceneManager;
 };
 
 #endif

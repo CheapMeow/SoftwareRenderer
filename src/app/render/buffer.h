@@ -4,6 +4,8 @@
 #include "SDL.h"
 #include <type_traits>
 
+#include <string>
+
 template<class T>
 struct Buffer
 {

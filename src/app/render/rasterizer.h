@@ -2,15 +2,15 @@
 #define RASTERIZER_H
 
 #include "SDL.h"
-#include "canvas.h"
+#include "buffer.h"
 #include "model.h"
 
 class Rasterizer
 {
 
 public:
-    Rasterizer(Canvas* canvas)
-        : mCanvas(canvas)
+    Rasterizer(Buffer<Uint32>* buffer)
+        : mPixelBuffer(buffer)
     {}
 
     void drawTriangles(Vector3& v1, Vector3& v2, Vector3& v3, float intensity);
@@ -38,7 +38,7 @@ private:
 
     void setDepthBufferAtLocation(int x, int y, float depth);
 
-    Canvas* mCanvas;
+    Buffer<Uint32>* mPixelBuffer;
 
     Uint32 white = SDL_MapRGBA(mappingFormat, 0xFF, 0xFF, 0xFF, 0xFF);
     Uint32 red   = SDL_MapRGBA(mappingFormat, 0xFF, 0x00, 0x00, 0xFF);
