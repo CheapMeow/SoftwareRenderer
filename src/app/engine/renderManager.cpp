@@ -56,9 +56,17 @@ bool RenderManager::createCanvas()
 {
     int pixelCount = WindowManager::SCREEN_WIDTH * WindowManager::SCREEN_HEIGHT;
     int pitch      = WindowManager::SCREEN_WIDTH * sizeof(Uint32);
-    mainCanvas     = new Canvas(
-        WindowManager::SCREEN_WIDTH, WindowManager::SCREEN_HEIGHT, pixelCount, pitch, new Uint32[pixelCount]);
+    mainCanvas     = new Canvas(WindowManager::SCREEN_WIDTH,
+                            WindowManager::SCREEN_HEIGHT,
+                            pixelCount,
+                            pitch,
+                            new Uint32[pixelCount],
+                            new float[pixelCount]);
     SDL_memset(mainCanvas->mBuffer, 0, mainCanvas->mPixelCount * sizeof(Uint32));
+    for (int i = 0; i < mainCanvas->mPixelCount; ++i)
+    {
+        mainCanvas->mDBuffer[i] = 2.0f;
+    }
     return mainCanvas != NULL;
 }
 
@@ -111,13 +119,14 @@ void RenderManager::render(Model* models, Matrix4& viewMatrix)
         if (v3.x < -1 || v3.x > 1 || v3.y < -1 || v3.y > 1 || v3.z > 1 || v3.z < -1)
             continue;
 
-        // Back face culling
+        // Back face culling in world space
         Vector3 N1      = (*vertices)[f.y - 1] - (*vertices)[f.x - 1];
         Vector3 N2      = (*vertices)[f.z - 1] - (*vertices)[f.x - 1];
         Vector3 N       = N1.crossProduct(N2);
         N               = N.normalized();
         float intensity = N.dotProduct(forward);
-        if (intensity > 0)
+
+        if (intensity > 0.0)
         {
             // rasterizing
             raster->drawTriangles(v1, v2, v3, intensity);
@@ -144,4 +153,8 @@ void RenderManager::clearScreen()
     SDL_SetRenderDrawColor(mainRenderer, 0x00, 0x00, 0x00, 0xFF);
     SDL_RenderClear(mainRenderer);
     memset(mainCanvas->mBuffer, 0, mainCanvas->mPitch * mainCanvas->mHeight);
+    for (int i = 0; i < mainCanvas->mPixelCount; ++i)
+    {
+        mainCanvas->mDBuffer[i] = 2.0f;
+    }
 }

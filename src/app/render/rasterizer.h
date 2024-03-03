@@ -34,6 +34,10 @@ private:
 
     int convertCoordinates(int x, int y);
 
+    float getDepthBufferAtLocation(int x, int y);
+
+    void setDepthBufferAtLocation(int x, int y, float depth);
+
     Canvas* mCanvas;
 
     Uint32 white = SDL_MapRGBA(mappingFormat, 0xFF, 0xFF, 0xFF, 0xFF);
