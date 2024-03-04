@@ -5,7 +5,6 @@
 #include <string>
 #include <type_traits>
 
-
 // Templated struct to emulate GPU buffers such as
 // the frame buffer and the ZBuffer along with others
 // Also keeps track of a bunch of useful data about itself
@@ -16,15 +15,17 @@ struct Buffer
     int mHeight;
     int mPixelCount;
     int mPitch;
+    int mOrigin;
     T*  buffer;
 
-    T& operator()(size_t x, size_t y) { return buffer[y * mWidth + x]; }
+    T& operator()(size_t x, size_t y) { return buffer[mOrigin + -y * mWidth + x]; }
 
     Buffer(int w, int h, T* array)
         : mWidth(w)
         , mHeight(h)
         , mPixelCount(w * h)
         , mPitch(w * sizeof(T))
+        , mOrigin(mHeight * mWidth - mWidth)
         , buffer(array)
     {}
 
