@@ -1,6 +1,7 @@
 #include "objParser.h"
 #include <scene.h>
 
+
 Scene::Scene(std::string path) { emptyScene = loadSceneModels(path); }
 
 Scene::~Scene()
@@ -41,7 +42,7 @@ bool Scene::loadSceneModels(std::string& path)
     else
     {
         TransformParameters initParameters;
-        initParameters.translation = Vector3f(0, -1.5, 0);
+        initParameters.translation = Vector3f(0, -5, 0);
         modelsInScene.push_back(new Model(fullPath, initParameters));
         return false;
     }
