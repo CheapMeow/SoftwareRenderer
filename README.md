@@ -1,5 +1,7 @@
 # SoftwareRenderer
 
+参考 [https://github.com/Angelo1211/SoftwareRenderer](https://github.com/Angelo1211/SoftwareRenderer)
+
 ## 画线
 
 Bresenham 画线算法
