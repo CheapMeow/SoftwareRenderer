@@ -57,11 +57,10 @@ void Engine::run(){
 
     //Main flags
     bool done = false;
-    bool switchScene = false;
 
     //Iteration and time keeping counters
     int count = 0;
-    unsigned int diff = 0;
+    unsigned int deltaT = 0;
     unsigned int start = 0;;
     unsigned int total = 0;
 
@@ -72,22 +71,22 @@ void Engine::run(){
 
         //Handle all user input
         //Switches scene too
-        gInputManager.processInput(done);
+        gInputManager.processInput(done, deltaT);
         
         //Update all models, camera and lighting in the current scene
-        gSceneManager.update();
+        gSceneManager.update(deltaT);
 
         //Update Rendering Queue and draw each item 
         gRenderManager.render();
 
         //Stats about frame
-        diff = SDL_GetTicks() - start;
-        printf("%2.1d: Loop elapsed time (ms):%d\n",count, diff);
-        total += diff;
-
+        deltaT = SDL_GetTicks() - start;
+        printf("%2.1d: Loop elapsed time (ms):%d\n",count, deltaT);
+        total += deltaT;
+        if(count == 500) break;
     }
 
     printf("Closing down engine.\n");
-    printf("Average frame time over %2.1d frames:%2.fms.\n", count,total/(float)count);
+    printf("Average frame time over %2.1d frames:%2.fms.\n", count, total/(float)count);
     
 }

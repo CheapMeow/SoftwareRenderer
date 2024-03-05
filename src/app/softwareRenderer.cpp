@@ -3,8 +3,6 @@
 #include "omp.h"
 #include "shader.h"
 
-#include <iostream>
-
 SoftwareRenderer::SoftwareRenderer() {}
 SoftwareRenderer::~SoftwareRenderer() {}
 
@@ -56,7 +54,6 @@ void SoftwareRenderer::drawTriangularMesh(Model* currentModel)
     shader.metalT    = currentModel->getMetallic();
 
     // Setting up lighting
-    Vector3f* lightDir       = (Vector3f*)malloc(mNumLights * 3 * sizeof(Vector3f));
     Vector3f* lightPositions = (Vector3f*)malloc(mNumLights * sizeof(Vector3f));
     Vector3f* lColor         = (Vector3f*)malloc(mNumLights * sizeof(Vector3f));
     for (int x = 0; x < mNumLights; ++x)
@@ -75,8 +72,7 @@ void SoftwareRenderer::drawTriangularMesh(Model* currentModel)
 
     shader.numLights = mNumLights;
     shader.lightCol  = lColor;
-
-    shader.lightPos = lightPositions;
+    shader.lightPos  = lightPositions;
 
     // Building worldToObject matrix
     Matrix4 worldToObject = (*(currentModel->getModelMatrix())).inverse();
@@ -85,10 +81,11 @@ void SoftwareRenderer::drawTriangularMesh(Model* currentModel)
     int      count = 0;
     Vector3f dummyDir; // TO DO FIX THIS
 
-#pragma omp parallel for private(trianglePrimitive, normalPrim, uvPrim, tangentPrim) firstprivate(shader, lightDir)
+#pragma omp parallel for private(trianglePrimitive, normalPrim, uvPrim, tangentPrim) firstprivate(shader)
+
     for (int j = 0; j < numFaces; ++j)
     {
-        std::cout << "lightDir = " << lightDir << std::endl;
+        Vector3f* lightDir = (Vector3f*)malloc(mNumLights * 3 * sizeof(Vector3f));
         shader.lightDirVal = lightDir;
         // Current vertex and normal indices
         Vector3i f = (*vIndices)[j];
@@ -122,10 +119,11 @@ void SoftwareRenderer::drawTriangularMesh(Model* currentModel)
         // Send to rasterizer which will also call the fragment shader and write to the
         // zbuffer and pixel buffer.
         Rasterizer::drawTriangles(trianglePrimitive, shader, pixelBuffer, zBuffer);
-    }
-    printf("%d faces drawn.\n", count);
 
-    free(lightDir);
+        free(lightDir);
+    }
+    // printf("%d faces drawn.\n", count);
+
     free(lightPositions);
     free(lColor);
 }
