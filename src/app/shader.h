@@ -230,9 +230,12 @@ struct PBRShader : public IShader {
     Vector3f cameraPos;
 
     //Light Variables
-    Vector3f lightColor{1,1,1}, F0{0.04, 0.04, 0.04}, F0corrected; //Default value dielectric
-    float nDotL, nDotV, ambientInt = 0.1;
-    Vector3f lightDir[3];
+    Vector3f F0{0.04, 0.04, 0.04}, F0corrected; //Default value dielectric
+    float nDotL, nDotV, ambientInt = 0.01;
+    int numLights;
+    Vector3f *lightDirVal;
+    Vector3f *lightCol;
+    Vector3f *lightPos;
 
     //Variables set per vertex
     Vector3f viewDir[3], texCoords[3];
@@ -249,6 +252,7 @@ struct PBRShader : public IShader {
     Vector3f halfwayDir, radianceOut, ambient;
     Vector3f specular, kD, kS;
     float interpRough, interpAO, interpMetal;
+    float uTexture, vTexture, intPart;
 
     //BRDF functions
     Vector3f fresnelSchlick(float cosTheta, Vector3f &fresnel0 ){
@@ -277,7 +281,7 @@ struct PBRShader : public IShader {
     }
 
     //Vertex shader
-    Vector3f vertex(const Vector3f &vertex, const Vector3f &normal,const Vector3f &textureVals, const Vector3f &tangent, const Vector3f &light, int index) override{
+    Vector3f vertex(const Vector3f &vertex, const Vector3f &normal,const Vector3f &textureVals, const Vector3f &tangent, const Vector3f &n, int index) override{
         //Creating TBN matrix
         normal_WS     = N.matMultDir(normal).normalized();
         tangent_WS    = N.matMultDir(tangent).normalized();
@@ -288,7 +292,10 @@ struct PBRShader : public IShader {
         texCoords[index] = textureVals;
 
         //Passing all lighting related data to tangent space
-        lightDir[index]  = TBN.matMultVec(light);
+        for(int lIndex = 0; lIndex < numLights; ++lIndex){
+            int indc2 = (lIndex*3) + index;
+            lightDirVal[indc2]  = TBN.matMultDir(lightPos[lIndex]);
+        }
         viewDir[index]   = TBN.matMultVec(cameraPos - M.matMultVec(vertex));
         
         return MVP.matMultVec(vertex);
@@ -298,44 +305,50 @@ struct PBRShader : public IShader {
     Vector3f fragment(float u, float v) override{
         //Interpolated stuff
         interpCoords   = texCoords[0] + (texCoords[1] - texCoords[0])* u + (texCoords[2] - texCoords[0]) * v;
-        interpLightDir = lightDir[0] + (lightDir[1] - lightDir[0])* u + (lightDir[2] - lightDir[0]) * v;
         interpViewDir  = viewDir[0] + (viewDir[1] - viewDir[0])* u + (viewDir[2] - viewDir[0]) * v;
 
+        //Correcting UV's for tiling
+        uTexture = std::modf(interpCoords.x, &intPart);
+        vTexture = std::modf(interpCoords.y, &intPart);
+
         //Reading data from textures for use in lighting calculations
-        interpCol    = albedoT->getPixelVal(interpCoords.x, interpCoords.y);
-        interpAO     = ambientOT->getIntensityVal(interpCoords.x, interpCoords.y);
-        interpRough  = roughT->getIntensityVal(interpCoords.x, interpCoords.y);
-        interpMetal  = metalT->getIntensityVal(interpCoords.x, interpCoords.y);
-        interpNormal = normalT->getPixelVal(interpCoords.x, interpCoords.y);
+        interpCol    = albedoT->getPixelVal(uTexture, vTexture);
+        interpAO     = ambientOT->getIntensityVal(uTexture, vTexture);
+        interpRough  = roughT->getIntensityVal(uTexture, vTexture);;
+        interpMetal  = metalT->getIntensityVal(uTexture, vTexture);
+        interpNormal = normalT->getPixelVal(uTexture, vTexture);
         interpNormal = interpNormal.normalized();
         interpViewDir = interpViewDir.normalized();
 
         //Setting up Direct Lighting variables
-        halfwayDir = (interpLightDir + interpViewDir).normalized();
-        nDotV = std::max(interpNormal.dotProduct(interpViewDir), 0.0f);
-        nDotL = std::max(interpNormal.dotProduct(interpLightDir), 0.0f);
-        F0corrected = (F0 * (1.0f-interpMetal)) + (interpCol * interpMetal);//Varying f0 based on metallicness of surface
         radianceOut.zero();
+        for(int light = 0; light < numLights; ++light ){
+            int val = light*3;
+            interpLightDir = lightDirVal[val] +  (lightDirVal[val + 1] - lightDirVal[val])* u +  (lightDirVal[val + 2] - lightDirVal[val]) * v;
+            halfwayDir = (interpLightDir.normalized() + interpViewDir).normalized();
+            nDotV = std::max(interpNormal.dotProduct(interpViewDir), 0.0f);
+            nDotL = std::max(interpNormal.dotProduct(interpLightDir), 0.0f);
+            F0corrected = (F0 * (1.0f-interpMetal)) + (interpCol * interpMetal);//Varying f0 based on metallicness of surface
 
-        //TODO:: Iterate through every light and set radiance 
-        //We assume the only light in the scene is the sun so there is no attenuation
+            //We assume the only light in the scene is the sun so there is no attenuation
+            
+            //Setting up BRDF
+            F   = fresnelSchlick(std::max(halfwayDir.dotProduct(interpViewDir), 0.0f), F0corrected);
+            NDF = distributionGGX(interpNormal, halfwayDir, interpRough); 
+            G   = GeometrySmith(interpRough);
+
+            //Calculating specular component of BRDF
+            Vector3f numerator = F * (G*NDF);
+            float invDenominator  = 1 / std::max(4.0 * nDotL * nDotV, 0.001);
+            specular  = numerator * invDenominator;
+
+            //Calculating the full rendering equation for a single light
+            kS = F;
+            kD = (Vector3f(1.0) - kS);
+            kD = kD * (1.0f - interpMetal); 
+            radianceOut +=  ( (kD * (interpCol * (1/M_PI)) + specular ) * nDotL * lightCol[light]);
+        }
         
-        //Setting up BRDF
-        F   = fresnelSchlick(std::max(halfwayDir.dotProduct(interpViewDir), 0.0f), F0corrected);
-        NDF = distributionGGX(interpNormal, halfwayDir, interpRough); 
-        G   = GeometrySmith(interpRough);
-
-        //Calculating specular component of BRDF
-        Vector3f numerator = F * (G*NDF);
-        float invDenominator  = 1 / std::max(4.0 * nDotL * nDotV, 0.001);
-        specular  = numerator * invDenominator;
-
-        //Calculating the full rendering equation for a single light
-        kS = F;
-        kD = (Vector3f(1.0) - kS);
-        kD = kD * (1.0f - interpMetal); 
-        radianceOut = ( (kD * (interpCol * (1/M_PI)) + specular ) * nDotL * lightColor);
-
         //Simplistic ambient term
         ambient =  interpCol * (ambientInt * interpAO);
 

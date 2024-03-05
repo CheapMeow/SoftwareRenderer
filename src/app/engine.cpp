@@ -21,13 +21,13 @@ bool Engine::startUp(){
         else{
             //Initializes renderer and connects it to the window manager
             //Also gets pointer to current scene
-            if( !gRenderManager.startUp(gDisplayManager,gSceneManager) ){
+            if( !gRenderManager.startUp(gDisplayManager, gSceneManager) ){
             success = false;
             printf("Failed to initialize render manager.\n");
             
             }
             else{
-                if ( !gInputManager.startUp() ){
+                if ( !gInputManager.startUp(gSceneManager) ){
                     success = false;
                     printf("Failed to initialize input manager.\n");
                 }
@@ -52,7 +52,7 @@ void Engine::shutDown(){
     printf("Closed display manager.\n");
 }
 
-//Runs main application loop and allows for scene changes
+//Runs main application loop
 void Engine::run(){
 
     //Main flags
@@ -61,30 +61,19 @@ void Engine::run(){
 
     //Iteration and time keeping counters
     int count = 0;
-    unsigned int end = 0;
+    unsigned int diff = 0;
     unsigned int start = 0;;
     unsigned int total = 0;
 
     printf("Entered Main Loop!\n");
     while(!done){
-        start = SDL_GetTicks();
         ++count;
-        
-        //If scene switching has been called you break out of the current loop 
-        if( switchScene ){
-            if( !gSceneManager.switchScene("teapot") ){
-                printf("Failed to switch scene! Quitting.\n");
-                break;
-            }
-            else{
-                switchScene = false;
-            } 
-        }
+        start = SDL_GetTicks();
 
         //Handle all user input
-        done = gInputManager.processInput();
+        //Switches scene too
+        gInputManager.processInput(done);
         
-
         //Update all models, camera and lighting in the current scene
         gSceneManager.update();
 
@@ -92,15 +81,13 @@ void Engine::run(){
         gRenderManager.render();
 
         //Stats about frame
-        end = SDL_GetTicks();
-        printf("%2.1d: Loop elapsed time (ms):%d\n",count,end - start);
-        total += end - start;
-        //if (count == 1000) break;
-        //if (count == 100) switchScene = true;
+        diff = SDL_GetTicks() - start;
+        printf("%2.1d: Loop elapsed time (ms):%d\n",count, diff);
+        total += diff;
 
     }
 
     printf("Closing down engine.\n");
-    printf("Average frame time over %2.1d frames: %2.fms.\n", count,total/(float)count);
+    printf("Average frame time over %2.1d frames:%2.fms.\n", count,total/(float)count);
     
 }
