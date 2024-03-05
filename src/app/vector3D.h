@@ -59,7 +59,7 @@ struct Vector3
     {
         return Vector3(x * rhs, y * rhs, z * rhs);
     }
-    Vector3 operator+(const T& rhs) const // Scalar-vector multiplication
+    Vector3 operator+(const T& rhs) const // Scalar-vector addition
     {
         return Vector3(x + rhs, y + rhs, z + rhs);
     }
@@ -68,6 +68,8 @@ struct Vector3
     Vector3 operator-(const Vector3& rhs) const { return Vector3(x - rhs.x, y - rhs.y, z - rhs.z); }
 
     Vector3 operator+(const Vector3& rhs) const { return Vector3(x + rhs.x, y + rhs.y, z + rhs.z); }
+
+    void operator+=(const Vector3& rhs) { (*this) = (*this) + rhs; }
 
     Vector3 operator*(const Vector3& rhs) const { return Vector3(x * rhs.x, y * rhs.y, z * rhs.z); }
 
