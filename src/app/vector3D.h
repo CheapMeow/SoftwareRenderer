@@ -104,7 +104,7 @@ struct Vector3
     static Vector3 reflect(const Vector3& I, const Vector3& N) { return I - ((N * I.dotProduct(N)) * 2.0f); }
 
     // Print for debugging purposes
-    void print()
+    void print() const
     {
         std::string str;
         if (std::is_same<T, float>::value)
