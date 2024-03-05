@@ -26,6 +26,7 @@ bool OBJ::fileExists(std::string& path)
 void OBJ::loadFileData(Mesh& mesh, std::ifstream& file)
 {
     std::string line, key, x, y, z;
+    float       tempU, tempV, intpart;
     Vector3i    indices[3];
     char        delimeter = '/';
     while (!file.eof())
@@ -46,9 +47,11 @@ void OBJ::loadFileData(Mesh& mesh, std::ifstream& file)
             mesh.normals.push_back(normal);
         }
         else if (key == "vt")
-        { // Normal data
+        { // Texture data
             iss >> x >> y;
-            Vector3f tex(std::stof(x), std::stof(y), 0);
+            tempU = std::modf(std::stof(x), &intpart);
+            tempV = std::modf(std::stof(y), &intpart);
+            Vector3f tex(tempU, tempV, 0);
             mesh.texels.push_back(tex);
         }
         else if (key == "f")

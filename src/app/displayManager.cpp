@@ -1,7 +1,5 @@
 #include "displayManager.h"
-
 #include <stdio.h>
-
 // Dummy constructurs/destructors
 DisplayManager::DisplayManager() {}
 DisplayManager::~DisplayManager() {}
@@ -21,16 +19,9 @@ bool DisplayManager::startUp()
         }
         else
         {
-            if (!createSDLRenderer())
+            if (!createScreenSurface())
             {
                 success = false;
-            }
-            else
-            {
-                if (!createScreenTexture())
-                {
-                    success = false;
-                }
             }
         }
     }
@@ -39,13 +30,6 @@ bool DisplayManager::startUp()
 
 void DisplayManager::shutDown()
 {
-    mTexturePixels = nullptr;
-
-    SDL_DestroyTexture(mTexture);
-    mTexture = nullptr;
-
-    SDL_DestroyRenderer(mSDLRenderer);
-    mSDLRenderer = nullptr;
 
     SDL_DestroyWindow(mWindow);
     mWindow = nullptr;
@@ -75,24 +59,12 @@ bool DisplayManager::createWindow()
     return true;
 }
 
-bool DisplayManager::createSDLRenderer()
+bool DisplayManager::createScreenSurface()
 {
-    mSDLRenderer = SDL_CreateRenderer(mWindow, -1, SDL_RENDERER_PRESENTVSYNC);
-    if (mSDLRenderer == nullptr)
+    mSurface = SDL_GetWindowSurface(mWindow);
+    if (mSurface == NULL)
     {
-        printf("Could not create renderer context. Error: %s\n", SDL_GetError());
-        return false;
-    }
-    return true;
-}
-
-bool DisplayManager::createScreenTexture()
-{
-    mTexture = SDL_CreateTexture(
-        mSDLRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
-    if (mTexture == NULL)
-    {
-        printf("Could not create texture. Error: %s\n", SDL_GetError());
+        printf("Could not create window surface. Error: %s\n", SDL_GetError());
         return false;
     }
     return true;
@@ -100,27 +72,21 @@ bool DisplayManager::createScreenTexture()
 
 void DisplayManager::clear()
 {
-    SDL_SetRenderDrawColor(mSDLRenderer, 0x00, 0x00, 0x00, 0xFF);
-    SDL_RenderClear(mSDLRenderer);
+    // Clear to black
+    SDL_LockSurface(mSurface);
+    SDL_memset(mSurface->pixels, 0, mSurface->h * mSurface->pitch);
+    SDL_UnlockSurface(mSurface);
 }
 
 void DisplayManager::swapBuffers(Buffer<Uint32>* pixels)
 {
+    // Allows surface editing
+    SDL_LockSurface(mSurface);
 
-    // Lock texture for manipulation
-    SDL_LockTexture(mTexture, NULL, &mTexturePixels, &mTexturePitch);
+    // Copy pixels buffer resuls to screen surface
+    memcpy(mSurface->pixels, pixels->buffer, pixels->mHeight * pixels->mPitch);
+    SDL_UnlockSurface(mSurface);
 
-    // Copy pixels to texture memory PRETTY SLOW. FIX?
-    memcpy(mTexturePixels, pixels->buffer, SCREEN_HEIGHT * mTexturePitch);
-
-    // Unlocking texture to apply pixel changes
-    SDL_UnlockTexture(mTexture);
-    mTexturePixels = nullptr;
-
-    // Setting blendmode for copy operation to renderer backbuffer
-    SDL_SetTextureBlendMode(mTexture, SDL_BLENDMODE_BLEND);
-    SDL_RenderCopy(mSDLRenderer, mTexture, NULL, NULL);
-
-    // Update screen to window
-    SDL_RenderPresent(mSDLRenderer);
+    // Update surface to window
+    SDL_UpdateWindowSurface(mWindow);
 }
