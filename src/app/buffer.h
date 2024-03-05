@@ -45,7 +45,7 @@ struct Buffer
         }
         else
         {
-            memset(buffer, 0, mPitch * mHeight);
+            memset(buffer, 0xD, mPitch * mHeight);
         }
     }
 };

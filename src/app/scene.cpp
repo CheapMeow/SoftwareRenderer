@@ -1,7 +1,12 @@
 #include "scene.h"
 #include "objParser.h"
+#include <sys/stat.h>
+#include <sys/types.h>
 
-Scene::Scene(std::string path) { emptyScene = loadSceneModels(path); }
+struct stat info;
+
+// For now a scene only contains a single model
+Scene::Scene(const std::string& sceneFolder) { emptyScene = loadSceneModels(sceneFolder); }
 
 Scene::~Scene()
 {
@@ -25,26 +30,50 @@ void Scene::update()
     frustrumCulling();
 }
 
-bool Scene::loadSceneModels(std::string& path)
+// Check if the scene exists and if it contains any valid mesh
+bool Scene::loadSceneModels(const std::string& sceneFolder)
 {
-    // In the future I want to read all o the models in the model folder
-    // And build them here. For now only one is loaded.
-    std::string fullPath = "../../../resources/models/";
-    fullPath             = fullPath + path;
+    std::string path = "../../../resources/scenes/";
+    path += sceneFolder;
 
-    if (!OBJ::fileExists(fullPath))
+    // Check if the current scene folder acually exists both in windows and linux
+    // And also checks if it can be accessed
+    if (stat(path.c_str(), &info) != 0)
     {
-        printf("Error! File:%s does not exist.\n", path.c_str());
-        return true;
+        printf("cannot access %s\n", path.c_str());
+    }
+    else if (info.st_mode & S_IFDIR)
+    {
+        printf("%s is a valid scene\n", path.c_str());
+
+        // Build a base file path that all models will use
+        // Use it to do an early quit in case the mesh does not exist
+        std::string baseFilePath = path + "/" + sceneFolder;
+        std::string meshFilePath = baseFilePath + "_mesh.obj";
+        if (!OBJ::fileExists(meshFilePath))
+        {
+            printf("Error! Mesh: %s does not exist.\n", meshFilePath.c_str());
+            return true;
+        }
+        else
+        {
+            printf("%s is a valid mesh\n", meshFilePath.c_str());
+            TransformParameters initParameters;
+            initParameters.rotation = Vector3f(90 * M_PI / 180.0f, 0, 0);
+            // initParameters.translation = Vector3f(0, -0.5, 0);
+            initParameters.scaling     = Vector3f(0.3, 0.3, 0.3);
+            initParameters.translation = Vector3f(0, 0, 0);
+            modelsInScene.push_back(new Model(baseFilePath, initParameters));
+            return false;
+        }
     }
     else
     {
-        TransformParameters initParameters;
-        // initParameters.rotation = Vector3f(90*M_PI/180.0f, 0 , 0);
-        initParameters.translation = Vector3f(0, -0.5, 0);
-        modelsInScene.push_back(new Model(fullPath, initParameters));
-        return false;
+        printf("Error! Scene: %s does not exist.\n", path.c_str());
+        return true;
     }
+
+    return true;
 }
 
 void Scene::frustrumCulling()

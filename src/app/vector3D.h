@@ -54,7 +54,7 @@ struct Vector3
     }
 
     // Scalar-vector operations
-    Vector3 operator-() { return Vector3(-x, -y, -z); }
+    Vector3 operator-() const { return Vector3(-x, -y, -z); }
     Vector3 operator*(const T& rhs) const // Scalar-vector multiplication
     {
         return Vector3(x * rhs, y * rhs, z * rhs);
